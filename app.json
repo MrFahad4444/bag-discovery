@@ -27,6 +27,7 @@
     },
     "plugins": [
       "expo-router",
+      "nativewind/babel",
       [
         "expo-splash-screen",
         {
