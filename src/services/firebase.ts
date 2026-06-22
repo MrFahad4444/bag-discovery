@@ -2,6 +2,9 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 // These values are stored in .env.local (not committed to Git for security)
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
