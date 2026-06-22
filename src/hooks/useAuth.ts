@@ -1,4 +1,4 @@
-import { onAuthStateChanged, signInAnonymously, Unsubscribe } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
 import { ModelAuthState } from '../types';
@@ -11,7 +11,8 @@ function useAuth() {
         error: null,
     });
 
-    const onAuthorized = async (): Promise<Unsubscribe> => {
+    // Run on component when it's mounted
+    useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             try {
                 if (user) {
@@ -36,13 +37,6 @@ function useAuth() {
 
         });
         return unsubscribe
-    }
-
-    // Run on component when it's mounted
-    useEffect(() => {
-        onAuthorized().then((unsubscribe) => {
-            return () => unsubscribe();
-        });
     }, [])
 
     return authState;
