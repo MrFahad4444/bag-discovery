@@ -1,13 +1,15 @@
 import { BagCard } from '@/src/components';
+import { useTranslation } from '@/src/hooks';
+import { useAuth } from '@/src/hooks/useAuth';
+import { useBagsInfinite } from '@/src/hooks/useBags';
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useAuth } from '../src/hooks/useAuth';
-import { useBagsInfinite } from '../src/hooks/useBags';
-import { Category } from '../src/types';
+import { Category } from '../../src/types';
 
 export default function ListScreen() {
   const { user, loading } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>();
+  const { t, isRTL } = useTranslation();
 
   const {
     data,
@@ -52,24 +54,36 @@ export default function ListScreen() {
   }
 
   const categories: (Category | undefined)[] = [undefined, 'bakery', 'restaurant', 'grocery'];
-  const categoryLabels = { undefined: 'All', bakery: 'Bakery', restaurant: 'Restaurant', grocery: 'Grocery' };
 
   return (
     <View className="bg-gray-50 flex-1">
       {/* Category Filter */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="bg-white px-4 py-3 border-b border-gray-200">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        // 🌟 Crucial: Forces the horizontal row elements to order correctly from right-to-left
+
+        className="bg-white px-4 py-3 border-b border-gray-200"
+      >
         <View className="flex-row gap-2">
-          {categories.map((cat) => (
-            <TouchableOpacity
-              key={cat || 'all'}
-              onPress={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 h-8 rounded-full ${selectedCategory === cat ? 'bg-blue-500' : 'bg-gray-200'}`}
-            >
-              <Text className={selectedCategory === cat ? 'text-white font-semibold' : 'text-gray-700'}>
-                {categoryLabels[cat as keyof typeof categoryLabels]}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {categories.map((cat) => {
+            // Map the dynamic or null category ID safely to your locale keys
+            const categoryKey = cat ? (cat.toLowerCase() as 'bakery' | 'restaurant' | 'grocery') : 'all';
+            const localizedLabel = t(categoryKey);
+
+            return (
+              <TouchableOpacity
+                key={cat || 'all'}
+                onPress={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 h-8 rounded-full ${selectedCategory === cat ? 'bg-blue-500' : 'bg-gray-200'
+                  }`}
+              >
+                <Text className={selectedCategory === cat ? 'text-white font-semibold' : 'text-gray-700'}>
+                  {localizedLabel}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
 

@@ -2,12 +2,15 @@ import { Status } from '@/src/types';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { EmptyListState, ReservationCard } from '../src/components';
-import { useAuth, useUpdateReservationStatus, useUserReservationsListener } from '../src/hooks';
+import { EmptyListState, ReservationCard } from '../../src/components';
+import { useAuth, useTranslation, useUpdateReservationStatus, useUserReservationsListener } from '../../src/hooks';
+
 
 export default function ReservationsScreen() {
     const { user } = useAuth();
     const router = useRouter();
+
+    const { t } = useTranslation();
 
     // Track which reservation and status is updating
     const [updatingState, setUpdatingState] = useState<{
@@ -47,11 +50,11 @@ export default function ReservationsScreen() {
         error,
         data: reservations,
 
-        emptyMessage: 'No reservations yet',
-        errorMessage: 'Error loading reservations',
+        emptyMessage: t('noReservationsYet'),
+        errorMessage: t('errorLoadingReservations'),
 
-        buttonText: 'Browse Bags',
-        onButtonPress: () => router.push('/'),
+        buttonText: t('browseBags'),
+        onButtonPress: () => { },
     });
 
 

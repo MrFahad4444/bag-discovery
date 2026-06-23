@@ -1,9 +1,10 @@
 import { ReservationCard } from '@/src/components';
 import { useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useAuth, useUserReservations } from '../src/hooks';
+import { useAuth, useTranslation, useUserReservations } from '../src/hooks'; // 🌟 Imported useTranslation
 
 export default function ConfirmationScreen() {
+    const { t } = useTranslation(); // 🌟 Destructured your flat translation tool
     const { user } = useAuth();
     const { data: reservations = [] } = useUserReservations(user?.uid || '');
     const router = useRouter();
@@ -13,7 +14,7 @@ export default function ConfirmationScreen() {
     const handleViewReservations = () => {
         router.back(); // Pop confirmation
         router.back(); // Pop detail screen
-        router.push('/reservations'); // Go to reservations
+        // router.push(''); // Go to reservations
     };
 
     return (
@@ -26,12 +27,12 @@ export default function ConfirmationScreen() {
 
                 {/* Title */}
                 <Text className="text-3xl font-bold text-gray-900 text-center mb-4">
-                    Reservation Confirmed!
+                    {t('reservationConfirmed')}
                 </Text>
 
                 {/* Message */}
                 <Text className="text-gray-600 text-center text-lg mb-8">
-                    Your bag has been reserved successfully.
+                    {t('reservationSuccessMsg')}
                 </Text>
 
                 {/* Reservation Details */}
@@ -50,7 +51,7 @@ export default function ConfirmationScreen() {
                     className="w-full bg-blue-500 py-4 rounded-lg mb-3"
                 >
                     <Text className="text-white text-center font-semibold text-lg">
-                        Back to Home
+                        {t('backToHome')}
                     </Text>
                 </TouchableOpacity>
 
@@ -59,7 +60,7 @@ export default function ConfirmationScreen() {
                     className="w-full bg-gray-200 py-4 rounded-lg"
                 >
                     <Text className="text-gray-900 text-center font-semibold text-lg">
-                        View My Reservations
+                        {t('viewMyReservations')}
                     </Text>
                 </TouchableOpacity>
             </View>

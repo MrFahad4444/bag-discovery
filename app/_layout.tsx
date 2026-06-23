@@ -1,65 +1,59 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { Header, LanguageToggle } from '@/src/components';
+import { useTranslation } from '@/src/hooks'; // 🌟 Added localization hook import
+import { LanguageProvider } from '@/src/provider/LanguageProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack, useRouter } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
+import { Stack } from 'expo-router';
 import '../global.css';
 
+const queryClient = new QueryClient();
 
-function ReservationsButton() {
-    const router = useRouter();
+// 🌟 Inner navigator component created to consume Context translation functions safely
+function AppNavigator() {
+    const { t } = useTranslation();
+    const header = Header();
 
     return (
-        <TouchableOpacity
-            onPress={() => router.push('/reservations')}
-            className="mr-4"
+        <Stack
+            screenOptions={{
+                headerShown: true,
+                headerBackTitle: t('back'), // Translates the native system back text dynamically
+                headerTintColor: '#000000',
+                headerTitleStyle: {
+                    fontWeight: '900',
+                },
+            }}
         >
-            <MaterialIcons name="bookmark" size={24} color="#3B82F6" />
-        </TouchableOpacity>
+            <Stack.Screen
+                name="tabs"
+                options={header({ title: t('bagDiscovery') })}
+            />
+
+            <Stack.Screen
+                name="bag"
+                options={{
+                    title: t('bagDetails'),
+                    headerRight: () => <LanguageToggle />,
+                }}
+            />
+
+            <Stack.Screen
+                name="confirmation"
+                options={{
+                    title: t('confirmation'),
+                    headerRight: () => <LanguageToggle />,
+                }}
+            />
+        </Stack>
     );
 }
-
-const queryClient = new QueryClient();
 
 export default function RootLayout() {
     return (
         <QueryClientProvider client={queryClient}>
-            <Stack
-                screenOptions={{
-                    headerShown: true,
-                    headerBackTitle: 'Back',
-                    headerTintColor: '#000000',
-                    headerTitleStyle: {
-                        fontWeight: '900',
-                    },
-                }}
-            >
-                <Stack.Screen
-                    name="index"
-                    options={{
-                        title: 'Bag Discovery',
-                        headerShown: true,
-                        headerRight: () => <ReservationsButton />,
-                    }}
-                />
-                <Stack.Screen
-                    name="bag"
-                    options={{
-                        title: 'Bag Details',
-                    }}
-                />
-                <Stack.Screen
-                    name="reservations"
-                    options={{
-                        title: 'My Reservations',
-                    }}
-                />
-                <Stack.Screen
-                    name="confirmation"
-                    options={{
-                        title: 'Confirmation',
-                    }}
-                />
-            </Stack>
+            <LanguageProvider>
+                {/* 🌟 Nest the translated navigator block clean inside the provider shell */}
+                <AppNavigator />
+            </LanguageProvider>
         </QueryClientProvider>
     );
 }

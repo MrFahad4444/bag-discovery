@@ -2,23 +2,28 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from '../hooks'; // Check path accuracy
 import { Bag } from '../types';
 
 export default function BagCard({ item }: { item: Bag }) {
+    const { t, language } = useTranslation(); // Dichted isRTL flag layout rules completely
 
     const pickupStartTime = new Date(item.pickupStart.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const pickupEndTime = new Date(item.pickupEnd.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    console.log(`Image URL: ${item.imageUrl}`);
+    // Fall back to English if Arabic name entry does not exist on database model 
+    const localizedBagName = language === 'ar' && item.name.ar ? item.name.ar : item.name.en;
+
+    // Map categories dynamically to JSON localization files
+    const categoryKey = item.category.toLowerCase() as 'bakery' | 'restaurant' | 'grocery';
+    const localizedCategory = t(categoryKey);
 
     return (
         <Link href={`/bag/${item.id}`} asChild>
             <TouchableOpacity className="bg-white mx-3 my-2 rounded-lg overflow-hidden shadow-sm">
-
-                {/* 1. CRITICAL: A wrapper View to keep all layout calculations stable inside the Link */}
                 <View className="w-full flex-col">
 
-                    {/* 2. REFACTORED IMAGE: Forced layout dimensions via style to bypass NativeWind bugs */}
+                    {/* Image Header wrapper remains fixed layout */}
                     <View style={{ width: '100%', height: 200, backgroundColor: '#e5e7eb' }}>
                         <Image
                             source={{ uri: item.imageUrl }}
@@ -26,41 +31,41 @@ export default function BagCard({ item }: { item: Bag }) {
                         />
                     </View>
 
-                    {/* Content */}
+                    {/* Text aligns dynamically based on parent container text writing rules */}
                     <View className="p-4">
-                        <Text className="text-sm text-gray-500 mb-1">
+                        <Text style={{ textAlign: 'auto' }} className="text-sm text-gray-500 mb-1">
                             {item.restaurantName}
                         </Text>
 
-                        <Text className="text-lg font-bold text-gray-900 mb-2">
-                            {item.name.en}
+                        <Text style={{ textAlign: 'auto' }} className="text-lg font-bold text-gray-900 mb-2">
+                            {localizedBagName}
                         </Text>
 
-                        {/* Price */}
+                        {/* Layout alignment naturally reacts to root direction container framework blocks */}
                         <View className="flex-row items-center gap-2 mb-3">
                             <Text className="text-xl font-bold text-green-600">
-                                {item.priceSAR} SAR
+                                {item.priceSAR} {t('sar')}
                             </Text>
                             <Text className="line-through text-gray-400 text-sm">
-                                {item.originalPriceSAR} SAR
+                                {item.originalPriceSAR} {t('sar')}
                             </Text>
                         </View>
 
-                        {/* Footer */}
+                        {/* Row structures flip natively inside parent container definitions */}
                         <View className="flex-row justify-between items-center">
                             <Text className="text-xs text-gray-500">
-                                Qty: {item.quantityRemaining}
+                                {t('qty')}: {item.quantityRemaining}
                             </Text>
 
                             <View className="bg-blue-100 px-3 py-1 rounded-full">
-                                <Text className="text-blue-800 text-md font-semibold capitalize">
-                                    {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                                <Text className="text-blue-800 text-md font-semibold">
+                                    {localizedCategory}
                                 </Text>
                             </View>
                         </View>
                     </View>
 
-                    {/* Pickup Schedule */}
+                    {/* Schedule Block aligns itself sequentially by reacting to root context flex rules */}
                     <View className="flex-row py-4 p-4 bg-blue-100 items-center justify-center gap-x-2">
                         <MaterialIcons name="schedule" size={18} color="#1e3a8a" />
                         <Text className="font-semibold text-blue-900 text-md">

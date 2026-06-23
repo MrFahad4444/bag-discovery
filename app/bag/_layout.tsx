@@ -1,3 +1,4 @@
+import { LanguageToggle } from '@/src/components';
 import { Stack } from 'expo-router';
 
 export default function BagLayout() {
@@ -13,6 +14,9 @@ export default function BagLayout() {
                     headerTitleStyle: {
                         fontWeight: '600',
                     },
+                    headerRight: () => <>
+                        <LanguageToggle />
+                    </>,
                 }}
             />
         </Stack>

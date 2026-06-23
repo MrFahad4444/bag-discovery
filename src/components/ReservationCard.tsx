@@ -1,6 +1,7 @@
 import { Reservation } from '@/src/types';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from '../hooks';
 
 interface ReservationCardProps {
     reservation: Reservation;
@@ -17,28 +18,33 @@ export default function ReservationCard({
     isUpdating = false,
     updatingStatus = null,
 }: ReservationCardProps) {
+
+    const { t } = useTranslation();
+
+
     const isConfirmed = reservation.status === 'confirmed';
     const isCancelled = reservation.status === 'cancelled';
 
     return (
         <View className="bg-white rounded-lg shadow-sm overflow-hidden">
+
             {/* Title */}
             <View className="px-5">
                 <Text className="text-center text-sm text-gray-500 mb-4 font-semibold mt-6">
-                    Reservation #{reservation.id.substring(0, 8)}
+                    {t('reservations')} #{reservation.id.substring(0, 8)}
                 </Text>
 
                 {/* Details */}
                 <View>
                     <View className="flex-row justify-between items-center border-b border-gray-200 pb-4 py-4">
-                        <Text className="text-gray-600">Bag ID</Text>
+                        <Text className="text-gray-600">{t('bagId')}</Text>
                         <Text className="font-semibold text-gray-900 text-xs">
                             {reservation.bagId.substring(0, 8)}
                         </Text>
                     </View>
 
                     <View className="flex-row justify-between items-center border-b border-gray-200 pb-4 py-4">
-                        <Text className="text-gray-600">Status</Text>
+                        <Text className="text-gray-600">{t('status')}</Text>
                         <Text
                             className={`font-semibold ${reservation.status === 'confirmed'
                                 ? 'text-green-600'
@@ -47,13 +53,12 @@ export default function ReservationCard({
                                     : 'text-red-600'
                                 }`}
                         >
-                            {reservation.status.charAt(0).toUpperCase() +
-                                reservation.status.slice(1)}
+                            {t(reservation.status)}
                         </Text>
                     </View>
 
                     <View className="flex-row justify-between items-center pb-4 py-4">
-                        <Text className="text-gray-600">Reserved At</Text>
+                        <Text className="text-gray-600">{t('reservedAt')}</Text>
                         <Text className="font-semibold text-gray-900 text-sm">
                             {new Date(reservation.createdAt.seconds * 1000).toLocaleDateString()}
                         </Text>
@@ -67,6 +72,7 @@ export default function ReservationCard({
                     {/* Pending State - Show Confirm/Cancel buttons */}
                     {!isConfirmed && !isCancelled && (
                         <View className="flex-row mt-4">
+
                             {/* Confirm Button */}
                             <TouchableOpacity
                                 onPress={() => onStatusChange?.('confirmed')}
@@ -81,13 +87,14 @@ export default function ReservationCard({
                                 ) : (
                                     <MaterialIcons name="check-circle" size={18} color="#16a34a" />
                                 )}
+
                                 <Text
                                     className={`text-center font-bold text-md ${isUpdating && updatingStatus === 'confirmed'
                                         ? 'text-green-400'
                                         : 'text-green-600'
                                         }`}
                                 >
-                                    Confirm
+                                    {t('confirm')}
                                 </Text>
                             </TouchableOpacity>
 
@@ -105,13 +112,14 @@ export default function ReservationCard({
                                 ) : (
                                     <MaterialIcons name="cancel" size={18} color="#dc2626" />
                                 )}
+
                                 <Text
                                     className={`text-center font-bold text-md ${isUpdating && updatingStatus === 'cancelled'
                                         ? 'text-red-400'
                                         : 'text-red-600'
                                         }`}
                                 >
-                                    Cancel
+                                    {t('cancel')}
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -130,13 +138,12 @@ export default function ReservationCard({
                             ) : (
                                 <MaterialIcons name="refresh" size={18} color="white" />
                             )}
+
                             <Text className="text-white text-center font-bold text-md">
-                                {isUpdating ? 'Processing...' : 'Refund'}
+                                {isUpdating ? t('processing') : t('refund')}
                             </Text>
                         </TouchableOpacity>
                     )}
-
-                    {/* Cancelled State - Show nothing */}
                 </>
             )}
         </View>
