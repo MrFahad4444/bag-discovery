@@ -1,57 +1,62 @@
+import { Status } from '@/src/types';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { ReservationCard } from '../src/components';
-import { useAuth, useUserReservationsInfinite } from '../src/hooks';
+import { useState } from 'react';
+import { FlatList, View } from 'react-native';
+import { EmptyListState, ReservationCard } from '../src/components';
+import { useAuth, useUpdateReservationStatus, useUserReservationsListener } from '../src/hooks';
 
 export default function ReservationsScreen() {
     const { user } = useAuth();
     const router = useRouter();
 
-    const {
-        data,
-        isLoading,
-        error,
-        hasNextPage,
-        fetchNextPage,
-        isFetchingNextPage,
-    } = useUserReservationsInfinite(user?.uid || '');
+    // Track which reservation and status is updating
+    const [updatingState, setUpdatingState] = useState<{
+        reservationId: string | null;
+        status: 'confirmed' | 'cancelled' | 'pending' | null;
+    }>({ reservationId: null, status: null });
 
-    const reservations = data?.pages.flatMap(page => page.reservations) ?? [];
+    // Get reservations from real-time listener
+    const { reservations, loading, error } = useUserReservationsListener(
+        user?.uid || ''
+    );
 
-    const handleEndReached = () => {
-        if (hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-        }
+    // Update reservation status mutation
+    const { mutate: updateStatus } = useUpdateReservationStatus();
+
+    const handleStatusChange = (
+        reservationId: string,
+        bagId: string,
+        status: 'confirmed' | 'cancelled' | 'pending'
+    ) => {
+        setUpdatingState({ reservationId, status });
+        updateStatus(
+            { reservationId, status: status as Status, bagId },
+            {
+                onSuccess: () => {
+                    setUpdatingState({ reservationId: null, status: null });
+                },
+                onError: () => {
+                    setUpdatingState({ reservationId: null, status: null });
+                },
+            }
+        );
     };
 
-    if (isLoading) {
-        return (
-            <View className="flex-1 justify-center items-center bg-gray-50">
-                <ActivityIndicator size="large" color="#3B82F6" />
-            </View>
-        );
-    }
+    const stateView = EmptyListState({
+        loading,
+        error,
+        data: reservations,
 
-    if (error) {
-        return (
-            <View className="flex-1 justify-center items-center bg-gray-50">
-                <Text className="text-red-500">Error loading reservations</Text>
-            </View>
-        );
-    }
+        emptyMessage: 'No reservations yet',
+        errorMessage: 'Error loading reservations',
 
-    if (!reservations || reservations.length === 0) {
-        return (
-            <View className="flex-1 justify-center items-center bg-gray-50">
-                <Text className="text-gray-500 text-lg">No reservations yet</Text>
-                <TouchableOpacity
-                    onPress={() => router.push('/')}
-                    className="mt-4 bg-blue-500 px-6 py-3 rounded-lg"
-                >
-                    <Text className="text-white font-semibold">Browse Bags</Text>
-                </TouchableOpacity>
-            </View>
-        );
+        buttonText: 'Browse Bags',
+        onButtonPress: () => router.push('/'),
+    });
+
+
+    if (stateView) {
+        return stateView;
     }
 
     return (
@@ -59,16 +64,20 @@ export default function ReservationsScreen() {
             <FlatList
                 data={reservations}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <ReservationCard reservation={item} />}
-                onEndReached={handleEndReached}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={
-                    isFetchingNextPage ? (
-                        <View className="py-4">
-                            <ActivityIndicator size="small" color="#3B82F6" />
-                        </View>
-                    ) : null
-                }
+                renderItem={({ item }) => (
+                    <View className="mb-4">
+                        <ReservationCard
+                            reservation={item}
+                            isHistory={true}
+                            onStatusChange={(status) =>
+                                handleStatusChange(item.id, item.bagId, status)
+                            }
+                            isUpdating={updatingState.reservationId === item.id}
+                            updatingStatus={updatingState.status}
+                        />
+                    </View>
+                )}
+                contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
             />
         </View>
     );

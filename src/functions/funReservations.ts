@@ -1,13 +1,14 @@
 import { QueryConstraint, where } from 'firebase/firestore';
 import {
     addDocument,
+    getDocument,
     getDocuments,
     getPaginatedDocuments,
     listenToCollection,
-    listenToDocument,
-    updateDocument,
+    updateDocument
 } from '../services/firestore';
-import { Reservation, Status } from '../types';
+import { Bag, Reservation, Status } from '../types';
+import { handleTryCatch } from '../utils';
 
 
 const RESERVATIONS_PER_PAGE = 5;
@@ -44,36 +45,6 @@ export async function fetchUserReservationsPaginated(
     };
 }
 
-export async function fetchBagReservationsPaginated(
-    bagId: string,
-    pageNumber: number = 0
-): Promise<{ reservations: Reservation[]; pageNumber: number; hasMore: boolean }> {
-    const constraints: QueryConstraint[] = [
-        where('bagId', '==', bagId),
-    ];
-
-    const paginatedDocs = await getPaginatedDocuments(
-        'reservations',
-        constraints,
-        pageNumber,
-        RESERVATIONS_PER_PAGE,
-        `Error fetching reservations for bag ${bagId}:`
-    );
-
-    const hasMore = paginatedDocs.length === RESERVATIONS_PER_PAGE;
-
-    return {
-        reservations: paginatedDocs.map((item: any) => ({
-            id: item.id,
-            bagId: item.bagId,
-            userId: item.userId,
-            status: item.status,
-            createdAt: item.createdAt,
-        })),
-        pageNumber: pageNumber + 1,
-        hasMore,
-    };
-}
 
 // Create reservation
 export async function createReservation(
@@ -123,48 +94,51 @@ export async function fetchUserReservations(
     })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
 }
 
-// Get bag reservations
-export async function fetchBagReservations(
-    bagId: string
-): Promise<Reservation[]> {
-    const constraints: QueryConstraint[] = [
-        where('bagId', '==', bagId),
-        // orderBy('createdAt', 'desc'),
-    ];
 
-    const reservations = await getDocuments(
-        'reservations',
-        constraints,
-        `Error fetching reservations for bag ${bagId}:`
-    );
-
-    return reservations.map((item: any) => ({
-        id: item.id,
-        bagId: item.bagId,
-        userId: item.userId,
-        status: item.status,
-        createdAt: item.createdAt,
-    })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
-}
-
-// Update reservation status
 export async function updateReservationStatus(
     reservationId: string,
-    newStatus: Status
+    status: Status,
+    bagId: string
 ): Promise<void> {
-    return updateDocument<Reservation>(
-        'reservations',
-        reservationId,
-        { status: newStatus } as Partial<Reservation>,
-        'Error'
-    );
-}
+    return handleTryCatch(
+        async () => {
+            // Get current bag directly by document ID (not querying by 'id' field)
+            const bag = await getDocument('bags', bagId);
 
-// Cancel reservation
-export async function cancelReservation(
-    reservationId: string
-): Promise<void> {
-    return updateReservationStatus(reservationId, 'cancelled');
+            if (!bag) {
+                throw new Error('Bag not found');
+            }
+
+            const currentQuantity = bag.quantityRemaining;
+            const originalQuantity = bag.originalPriceSAR;
+
+            // Update reservation status
+            const updateData: Partial<Reservation> = { status };
+            await updateDocument<Reservation>(
+                'reservations',
+                reservationId,
+                updateData,
+                "sadasd"
+            );
+
+            // If confirming, reduce bag quantity
+            if (status === 'confirmed') {
+                const newQuantity = Math.max(0, currentQuantity - 1);
+                await updateDocument<Bag>('bags', bagId, {
+                    quantityRemaining: newQuantity,
+                } as Partial<Bag>, "sadasd");
+            }
+
+            // If going back to pending (refund), increase quantity
+            if (status === 'pending') {
+                const newQuantity = Math.min(originalQuantity, currentQuantity + 1);
+                await updateDocument<Bag>('bags', bagId, {
+                    quantityRemaining: newQuantity,
+                } as Partial<Bag>, "asdasdas");
+            }
+        },
+        'Error updating reservation status'
+    );
 }
 
 // Listen to user reservations
@@ -192,30 +166,6 @@ export function listenToUserReservations(
             callback(reservations);
         },
         constraints,
-        onError
-    );
-}
-
-// Listen to single reservation
-export function listenToReservation(
-    reservationId: string,
-    callback: (reservation: Reservation | null) => void,
-    onError?: (error: Error) => void
-): () => void {
-    return listenToDocument(
-        'reservations',
-        reservationId,
-        (data: any | null) => {
-            if (!data) return callback(null);
-
-            callback({
-                id: data.id,
-                bagId: data.bagId,
-                userId: data.userId,
-                status: data.status,
-                createdAt: data.createdAt,
-            });
-        },
         onError
     );
 }

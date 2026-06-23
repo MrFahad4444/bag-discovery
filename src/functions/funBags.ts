@@ -1,5 +1,5 @@
-import { QueryConstraint, Unsubscribe, where } from 'firebase/firestore';
-import { getDocument, getDocuments, getPaginatedDocuments, listenToCollection } from '../services/firestore';
+import { QueryConstraint, where } from 'firebase/firestore';
+import { getDocument, getDocuments, getPaginatedDocuments } from '../services/firestore';
 import { Bag, Category } from '../types';
 
 const BAGS_PER_PAGE = 5;
@@ -71,25 +71,4 @@ export async function fetchBagsByCategory(
         id: item.id,
         ...item,
     }));
-}
-
-// Listen to bags in real-time
-export function listenToBags(
-    callback: (bags: Bag[]) => void,
-    constraints: QueryConstraint[] = [],
-    onError?: (error: Error) => void
-): Unsubscribe {
-    return listenToCollection(
-        'bags',
-        (docs: any[]) => {
-            const bags: Bag[] = docs.map((item) => ({
-                id: item.id,
-                ...item,
-            }));
-
-            callback(bags);
-        },
-        constraints,
-        onError
-    );
 }

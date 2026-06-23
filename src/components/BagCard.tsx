@@ -61,7 +61,7 @@ export default function BagCard({ item }: { item: Bag }) {
                     </View>
 
                     {/* Pickup Schedule */}
-                    <View className="flex-row py-4 p-4 bg-blue-100 items-center justify-center gap-x-10">
+                    <View className="flex-row py-4 p-4 bg-blue-100 items-center justify-center gap-x-2">
                         <MaterialIcons name="schedule" size={18} color="#1e3a8a" />
                         <Text className="font-semibold text-blue-900 text-md">
                             {pickupStartTime} - {pickupEndTime}

@@ -1,5 +1,7 @@
-import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
-import { createReservation, fetchUserReservations, fetchUserReservationsPaginated } from '../functions/funReservations';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { createReservation, fetchUserReservations, listenToUserReservations, updateReservationStatus } from '../functions/funReservations';
+import { Reservation, Status } from '../types';
 
 // Create a reservation
 function useCreateReservation() {
@@ -18,18 +20,59 @@ function useUserReservations(userId: string) {
     });
 }
 
-// Fetch user's reservations with infinite scroll
-function useUserReservationsInfinite(userId: string) {
-    return useInfiniteQuery({
-        queryKey: ['reservations-infinite', userId],
-        queryFn: async ({ pageParam = 0 }) => {
-            return fetchUserReservationsPaginated(userId, pageParam as number);
+function useUpdateReservationStatus() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (params: {
+            reservationId: string;
+            status: Status;
+            bagId: string;  // Add this
+        }) => {
+            return updateReservationStatus(
+                params.reservationId,
+                params.status,
+                params.bagId  // Pass it
+            );
         },
-        getNextPageParam: (lastPage) => {
-            return lastPage.hasMore ? lastPage.pageNumber : undefined;
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['reservations'] });
+            queryClient.invalidateQueries({ queryKey: ['reservations-infinite'] });
         },
-        initialPageParam: 0,
     });
 }
 
-export { useCreateReservation, useUserReservations, useUserReservationsInfinite };
+function useUserReservationsListener(userId: string) {
+    const [reservations, setReservations] = useState<Reservation[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        if (!userId) {
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+
+        const unsubscribe = listenToUserReservations(
+            userId,
+            (data) => {
+                setReservations(data);
+                setLoading(false);
+            },
+            (err) => {
+                setError(err);
+                setLoading(false);
+            }
+        );
+
+        return () => unsubscribe();
+    }, [userId]);
+
+    return { reservations, loading, error };
+
+}
+
+export { useCreateReservation, useUpdateReservationStatus, useUserReservations, useUserReservationsListener };
+

@@ -1,6 +1,6 @@
 import { ReservationCard } from '@/src/components';
 import { useRouter } from 'expo-router';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useAuth, useUserReservations } from '../src/hooks';
 
 export default function ConfirmationScreen() {
@@ -10,8 +10,14 @@ export default function ConfirmationScreen() {
 
     const latestReservation = reservations[0];
 
+    const handleViewReservations = () => {
+        router.back(); // Pop confirmation
+        router.back(); // Pop detail screen
+        router.push('/reservations'); // Go to reservations
+    };
+
     return (
-        <ScrollView className="flex-1 bg-white">
+        <View className="flex-1 bg-white">
             <View className="flex-1 justify-center items-center px-6 py-12">
                 {/* Success Icon */}
                 <View className="w-20 h-20 bg-green-100 rounded-full justify-center items-center mb-6">
@@ -29,27 +35,34 @@ export default function ConfirmationScreen() {
                 </Text>
 
                 {/* Reservation Details */}
-                {latestReservation && <ReservationCard reservation={latestReservation} />}
+                {latestReservation && (
+                    <View className="w-full mb-5">
+                        <ReservationCard reservation={latestReservation} />
+                    </View>
+                )}
 
                 {/* Buttons */}
                 <TouchableOpacity
-                    onPress={() => router.push('/')}
+                    onPress={() => {
+                        router.back();
+                        router.back();
+                    }}
                     className="w-full bg-blue-500 py-4 rounded-lg mb-3"
                 >
                     <Text className="text-white text-center font-semibold text-lg">
-                        Browse More Bags
+                        Back to Home
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => router.replace('/')}
+                    onPress={handleViewReservations}
                     className="w-full bg-gray-200 py-4 rounded-lg"
                 >
                     <Text className="text-gray-900 text-center font-semibold text-lg">
-                        Go Home
+                        View My Reservations
                     </Text>
                 </TouchableOpacity>
             </View>
-        </ScrollView>
+        </View>
     );
 }
