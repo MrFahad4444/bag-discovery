@@ -1,12 +1,15 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { createReservation, fetchUserReservations } from '../functions/funReservations';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
+import { createReservation, fetchUserReservations, fetchUserReservationsPaginated } from '../functions/funReservations';
 
+// Create a reservation
 function useCreateReservation() {
     return useMutation({
-        mutationFn: ({ bagId, userId }: { bagId: string; userId: string }) => createReservation(bagId, userId),
+        mutationFn: ({ bagId, userId }: { bagId: string; userId: string }) =>
+            createReservation(bagId, userId),
     });
 }
 
+// Fetch user's reservations (simple)
 function useUserReservations(userId: string) {
     return useQuery({
         queryKey: ['reservations', userId],
@@ -15,5 +18,18 @@ function useUserReservations(userId: string) {
     });
 }
 
-export { useCreateReservation, useUserReservations };
+// Fetch user's reservations with infinite scroll
+function useUserReservationsInfinite(userId: string) {
+    return useInfiniteQuery({
+        queryKey: ['reservations-infinite', userId],
+        queryFn: async ({ pageParam = 0 }) => {
+            return fetchUserReservationsPaginated(userId, pageParam as number);
+        },
+        getNextPageParam: (lastPage) => {
+            return lastPage.hasMore ? lastPage.pageNumber : undefined;
+        },
+        initialPageParam: 0,
+    });
+}
 
+export { useCreateReservation, useUserReservations, useUserReservationsInfinite };

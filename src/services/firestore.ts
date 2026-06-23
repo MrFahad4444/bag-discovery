@@ -57,6 +57,37 @@ export async function getDocuments(
     }, errorPrefix);
 }
 
+export async function getPaginatedDocuments(
+    collectionName: string,
+    constraints: QueryConstraint[] = [],
+    pageNumber: number = 0,
+    pageSize: number = 10,
+    errorPrefix: string
+): Promise<any[]> {
+    return handleTryCatch<any[]>(async () => {
+        const baseCollection = collection(db, collectionName);
+
+        const collectionQuery =
+            constraints.length > 0
+                ? query(baseCollection, ...constraints)
+                : query(baseCollection);
+
+        const snapshot = await getDocs(collectionQuery);
+
+        const allDocs = snapshot.docs.map((docSnapshot) => ({
+            id: docSnapshot.id,
+            ...docSnapshot.data(),
+        }));
+
+        // Pagination logic
+        const startIndex = pageNumber * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedDocs = allDocs.slice(startIndex, endIndex);
+
+        return paginatedDocs;
+    }, errorPrefix);
+}
+
 // Adds a new document and returns its generated ID.
 export async function addDocument<T extends object>(
     collectionName: string,

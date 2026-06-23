@@ -1,12 +1,79 @@
-import { orderBy, QueryConstraint, where } from 'firebase/firestore';
+import { QueryConstraint, where } from 'firebase/firestore';
 import {
     addDocument,
     getDocuments,
+    getPaginatedDocuments,
     listenToCollection,
     listenToDocument,
     updateDocument,
 } from '../services/firestore';
 import { Reservation, Status } from '../types';
+
+
+const RESERVATIONS_PER_PAGE = 5;
+
+// Get paginated user reservations
+export async function fetchUserReservationsPaginated(
+    userId: string,
+    pageNumber: number = 0
+): Promise<{ reservations: Reservation[]; pageNumber: number; hasMore: boolean }> {
+    const constraints: QueryConstraint[] = [
+        where('userId', '==', userId),
+    ];
+
+    const paginatedDocs = await getPaginatedDocuments(
+        'reservations',
+        constraints,
+        pageNumber,
+        RESERVATIONS_PER_PAGE,
+        `Error fetching reservations for user ${userId}:`
+    );
+
+    const hasMore = paginatedDocs.length === RESERVATIONS_PER_PAGE;
+
+    return {
+        reservations: paginatedDocs.map((item: any) => ({
+            id: item.id,
+            bagId: item.bagId,
+            userId: item.userId,
+            status: item.status,
+            createdAt: item.createdAt,
+        })),
+        pageNumber: pageNumber + 1,
+        hasMore,
+    };
+}
+
+export async function fetchBagReservationsPaginated(
+    bagId: string,
+    pageNumber: number = 0
+): Promise<{ reservations: Reservation[]; pageNumber: number; hasMore: boolean }> {
+    const constraints: QueryConstraint[] = [
+        where('bagId', '==', bagId),
+    ];
+
+    const paginatedDocs = await getPaginatedDocuments(
+        'reservations',
+        constraints,
+        pageNumber,
+        RESERVATIONS_PER_PAGE,
+        `Error fetching reservations for bag ${bagId}:`
+    );
+
+    const hasMore = paginatedDocs.length === RESERVATIONS_PER_PAGE;
+
+    return {
+        reservations: paginatedDocs.map((item: any) => ({
+            id: item.id,
+            bagId: item.bagId,
+            userId: item.userId,
+            status: item.status,
+            createdAt: item.createdAt,
+        })),
+        pageNumber: pageNumber + 1,
+        hasMore,
+    };
+}
 
 // Create reservation
 export async function createReservation(
@@ -53,7 +120,7 @@ export async function fetchUserReservations(
         userId: item.userId,
         status: item.status,
         createdAt: item.createdAt,
-    }));
+    })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
 }
 
 // Get bag reservations
@@ -62,7 +129,7 @@ export async function fetchBagReservations(
 ): Promise<Reservation[]> {
     const constraints: QueryConstraint[] = [
         where('bagId', '==', bagId),
-        orderBy('createdAt', 'desc'),
+        // orderBy('createdAt', 'desc'),
     ];
 
     const reservations = await getDocuments(
@@ -77,7 +144,7 @@ export async function fetchBagReservations(
         userId: item.userId,
         status: item.status,
         createdAt: item.createdAt,
-    }));
+    })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
 }
 
 // Update reservation status
@@ -108,7 +175,7 @@ export function listenToUserReservations(
 ): () => void {
     const constraints: QueryConstraint[] = [
         where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
+        // orderBy('createdAt', 'desc'),
     ];
 
     return listenToCollection(
@@ -120,7 +187,7 @@ export function listenToUserReservations(
                 userId: item.userId,
                 status: item.status,
                 createdAt: item.createdAt,
-            }));
+            })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
 
             callback(reservations);
         },
