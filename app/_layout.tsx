@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
+import '../global.css';
 
 const queryClient = new QueryClient();
 
@@ -10,21 +11,21 @@ export default function RootLayout() {
                 screenOptions={{
                     headerShown: true,
                     headerBackTitle: 'Back',
-                    headerTintColor: '#3B82F6',
+                    headerTintColor: '#000000',
                     headerTitleStyle: {
-                        fontWeight: '600',
+                        fontWeight: '900',
                     },
                 }}
             >
                 <Stack.Screen
                     name="index"
                     options={{
-                        title: 'Bags',
+                        title: 'Bag Discovery',
                         headerShown: true,
                     }}
                 />
                 <Stack.Screen
-                    name="bag/[id]"
+                    name="bag"
                     options={{
                         title: 'Bag Details',
                     }}

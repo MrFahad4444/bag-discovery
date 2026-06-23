@@ -35,6 +35,7 @@ export default function BagDetailScreen() {
     }
 
     const handleReserve = () => {
+        console.log(`sdasdasdasd ${user == null}`)
         if (!user?.uid) {
             Alert.alert('Error', 'User not authenticated');
             return;
@@ -82,7 +83,7 @@ export default function BagDetailScreen() {
                         {bag.name.en}
                     </Text>
                     <View className="flex-row items-center gap-2">
-                        <Text className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
+                        <Text className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-md font-semibold">
                             {bag.category.charAt(0).toUpperCase() + bag.category.slice(1)}
                         </Text>
                     </View>
@@ -137,21 +138,24 @@ export default function BagDetailScreen() {
                 </View>
 
                 {/* Info Box */}
-                <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-                    <Text className="text-sm text-blue-900 font-medium">
-                        ℹ️ Hurry up! Limited stock available. Reserve now to secure your bag.
-                    </Text>
-                </View>
+                {
+                    bag.quantityRemaining > 10 ? <View className="p-4 mb-8" /> : <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                        <Text className="text-sm text-blue-900 font-medium">
+                            ℹ️ Hurry up! Limited stock available. Reserve now to secure your bag.
+                        </Text>
+                    </View>
+                }
+
 
                 {/* Reserve Button */}
                 <TouchableOpacity
                     onPress={handleReserve}
                     disabled={isPending || bag.quantityRemaining === 0}
                     className={`py-4 rounded-lg mb-3 ${bag.quantityRemaining === 0
-                            ? 'bg-gray-300'
-                            : isPending
-                                ? 'bg-blue-400'
-                                : 'bg-blue-500'
+                        ? 'bg-gray-300'
+                        : isPending
+                            ? 'bg-blue-400'
+                            : 'bg-blue-500'
                         }`}
                 >
                     <Text className="text-white text-center font-bold text-lg">

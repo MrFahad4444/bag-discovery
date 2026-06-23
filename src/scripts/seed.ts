@@ -1,53 +1,40 @@
+import dotenv from 'dotenv';
+import { initializeApp } from 'firebase/app';
+import {
+    collection,
+    doc,
+    getFirestore,
+    writeBatch,
+} from 'firebase/firestore';
 
+import { fakeBags } from '../data/fakeBags';
 
-import { addDocument } from '../services/firestore';
+dotenv.config({ path: '.env.local' });
 
-const fakeBags = [
-    {
-        restaurantId: 'rest-1',
-        restaurantName: 'Al Baik',
-        name: { en: 'Crispy Chicken Box', ar: 'صندوق الدجاج المقرمش' },
-        category: 'restaurant' as const,
-        priceSAR: 15,
-        originalPriceSAR: 45,
-        quantityRemaining: 3,
-        pickupStart: new Date(),
-        pickupEnd: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        imageUrl: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400',
-    },
-    {
-        restaurantId: 'rest-2',
-        restaurantName: 'Sugar Breads',
-        name: { en: 'Fresh Pastries', ar: 'المعجنات الطازجة' },
-        category: 'bakery' as const,
-        priceSAR: 10,
-        originalPriceSAR: 30,
-        quantityRemaining: 5,
-        pickupStart: new Date(),
-        pickupEnd: new Date(Date.now() + 3 * 60 * 60 * 1000),
-        imageUrl: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400',
-    },
-    {
-        restaurantId: 'rest-3',
-        restaurantName: 'Fresh Mart',
-        name: { en: 'Organic Vegetables', ar: 'الخضروات العضوية' },
-        category: 'grocery' as const,
-        priceSAR: 20,
-        originalPriceSAR: 50,
-        quantityRemaining: 8,
-        pickupStart: new Date(),
-        pickupEnd: new Date(Date.now() + 4 * 60 * 60 * 1000),
-        imageUrl: 'https://images.unsplash.com/photo-1488459716781-6818f6d3c3d0?w=400',
-    },
-];
+const app = initializeApp({
+    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+});
+
+const db = getFirestore(app);
 
 async function seedDatabase() {
     try {
-        for (const bagData of fakeBags) {
-            const id = await addDocument('bags', bagData, 'Error adding bag:');
-            console.log(`✅ Added bag: ${id}`);
-        }
-        console.log('\n✅ Seeding  complete!');
+        const batch = writeBatch(db);
+        const collectionRef = collection(db, 'bags');
+
+        fakeBags.forEach((bag) => {
+            const ref = doc(collectionRef); // auto-id
+            batch.set(ref, bag);
+        });
+
+        await batch.commit();
+
+        console.log(`✅ Seeded ${fakeBags.length} bags in 1 batch`);
         process.exit(0);
     } catch (error) {
         console.error('❌ Seeding failed:', error);

@@ -7,7 +7,7 @@ export default function BagLayout() {
                 name="[id]"
                 options={{
                     title: 'Bag Details',
-                    headerShown: true,
+                    headerShown: false,
                     headerBackTitle: 'Back',
                     headerTintColor: '#3B82F6',
                     headerTitleStyle: {

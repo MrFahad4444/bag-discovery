@@ -38,7 +38,7 @@ export async function fetchUserReservations(
 ): Promise<Reservation[]> {
     const constraints: QueryConstraint[] = [
         where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
+        // orderBy('createdAt', 'desc'),
     ];
 
     const reservations = await getDocuments(

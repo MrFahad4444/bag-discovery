@@ -1,46 +1,34 @@
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
-import { ModelAuthState } from '../types';
 
-function useAuth() {
-    // State to track user, loading, and errors
-    const [authState, setAuthState] = useState<ModelAuthState>({
-        user: null,
-        loading: true,
-        error: null,
-    });
+export default function useAuth() {
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Run on component when it's mounted
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            try {
-                if (user) {
-                    setAuthState({
-                        user, loading: false, error: null
-                    });
-                } else {
+        // First, try to sign in anonymously if no user exists
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                // User already logged in
+                setUser(currentUser);
+                setLoading(false);
+            } else {
+                // No user, sign in anonymously
+                try {
                     const result = await signInAnonymously(auth);
-                    setAuthState({
-                        user: result.user,
-                        loading: false,
-                        error: null,
-                    });
+                    setUser(result.user);
+                } catch (error) {
+                    console.error('Anonymous auth failed:', error);
                 }
-            } catch (error) {
-                setAuthState({
-                    user: null,
-                    loading: false,
-                    error: error as Error,
-                });
+                setLoading(false);
             }
-
         });
-        return unsubscribe
-    }, [])
 
-    return authState;
+        return () => unsubscribe();
+    }, []);
 
+    return { user, loading };
 }
 
 export { useAuth };

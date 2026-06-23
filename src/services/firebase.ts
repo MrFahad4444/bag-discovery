@@ -1,11 +1,9 @@
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getReactNativePersistence, initializeAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
-
-// These values are stored in .env.local (not committed to Git for security)
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -15,13 +13,13 @@ const firebaseConfig = {
     appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase with the config above
 const app = initializeApp(firebaseConfig);
 
-// Get reference to Firebase Authentication service
-export const auth = getAuth(app);
+// Initialize auth with AsyncStorage persistence
+export const auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+});
 
-// Get reference to Firestore database
 export const db = getFirestore(app);
 
 export default app;
