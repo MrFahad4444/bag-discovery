@@ -1,3 +1,4 @@
+import { ReservationCard } from '@/src/components';
 import { useRouter } from 'expo-router';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth, useUserReservations } from '../src/hooks';
@@ -28,39 +29,7 @@ export default function ConfirmationScreen() {
                 </Text>
 
                 {/* Reservation Details */}
-                {latestReservation && (
-                    <View className="w-full bg-gray-50 rounded-lg p-6 mb-8">
-                        <Text className="text-sm text-gray-500 mb-4">Reservation Details</Text>
-
-                        <View className="space-y-3">
-                            <View className="flex-row justify-between border-b border-gray-200 pb-3">
-                                <Text className="text-gray-600">Reservation ID</Text>
-                                <Text className="font-semibold text-gray-900 text-xs">
-                                    {latestReservation.id.substring(0, 8)}...
-                                </Text>
-                            </View>
-
-                            <View className="flex-row justify-between border-b border-gray-200 pb-3">
-                                <Text className="text-gray-600">Status</Text>
-                                <Text className={`font-semibold ${latestReservation.status === 'confirmed'
-                                    ? 'text-green-600'
-                                    : latestReservation.status === 'pending'
-                                        ? 'text-yellow-600'
-                                        : 'text-red-600'
-                                    }`}>
-                                    {latestReservation.status.charAt(0).toUpperCase() + latestReservation.status.slice(1)}
-                                </Text>
-                            </View>
-
-                            <View className="flex-row justify-between pb-3">
-                                <Text className="text-gray-600">Reserved At</Text>
-                                <Text className="font-semibold text-gray-900 text-sm">
-                                    {new Date(latestReservation.createdAt.seconds * 1000).toLocaleDateString()}
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-                )}
+                {latestReservation && <ReservationCard reservation={latestReservation} />}
 
                 {/* Buttons */}
                 <TouchableOpacity
