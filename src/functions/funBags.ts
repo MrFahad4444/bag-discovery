@@ -1,5 +1,5 @@
 import { QueryConstraint, where } from 'firebase/firestore';
-import { getDocument, getDocuments, getPaginatedDocuments } from '../services/firestore';
+import { getDocument, getDocuments, getPaginatedDocuments, listenToDocument, updateDocument } from '../services/firestore';
 import { Bag, Category } from '../types';
 
 const BAGS_PER_PAGE = 5;
@@ -11,7 +11,7 @@ const BAGS_PER_PAGE = 5;
  *
  * @returns Array of Bag objects
  */
-export async function fetchAllBags(
+async function fetchAllBags(
     constraints: QueryConstraint[] = []
 ): Promise<Bag[]> {
     const bags = await getDocuments(
@@ -33,7 +33,7 @@ export async function fetchAllBags(
  * @var BAGS_PER_PAGE - using this for bags per page
  * @returns Paginated bags with next page metadata
  */
-export async function fetchPaginatedBags(
+async function fetchPaginatedBags(
     constraints: QueryConstraint[] = [],
     pageNumber: number = 0
 ): Promise<{ bags: Bag[]; pageNumber: number; hasMore: boolean }> {
@@ -64,7 +64,7 @@ export async function fetchPaginatedBags(
  *
  * @returns Bag object if found, otherwise null
  */
-export async function getBagById(bagId: string): Promise<Bag | null> {
+async function getBagById(bagId: string): Promise<Bag | null> {
     const data = await getDocument('bags', bagId);
 
     if (!data) return null;
@@ -82,7 +82,7 @@ export async function getBagById(bagId: string): Promise<Bag | null> {
  *
  * @returns Array of bags matching the category
  */
-export async function fetchBagsByCategory(
+async function fetchBagsByCategory(
     category: Category
 ): Promise<Bag[]> {
     const constraints = [
@@ -96,3 +96,45 @@ export async function fetchBagsByCategory(
         ...item,
     }));
 }
+
+
+/**
+ * Listen to a specific bag in real-time (for detail screen).
+ *
+ * @param bagId - Firestore document ID of the bag
+ * @param callback - Called whenever the bag updates
+ * @param onError - Optional error handler
+ *
+ * @returns Unsubscribe function
+ */
+function listenToBag(
+    bagId: string,
+    callback: (bag: Bag | null) => void,
+    onError?: (error: Error) => void
+): () => void {
+    return listenToDocument(
+        'bags',
+        bagId,
+        callback,
+        onError
+    );
+}
+
+/**
+ * Updates the remaining quantity of a specific bag in Firestore.
+ *
+ * @param bagId - Unique identifier of the bag document
+ * @param quantity - New quantity value to set for `quantityRemaining`
+ * @returns Promise that resolves when the update is completed
+ */
+function updateBagQuantity(bagId: string, quantity: number): Promise<void> {
+    return updateDocument(
+        'bags',
+        bagId,
+        { quantityRemaining: quantity },
+        'Failed to update bag quantity'
+    );
+}
+
+export { fetchAllBags, fetchBagsByCategory, fetchPaginatedBags, getBagById, listenToBag, updateBagQuantity };
+

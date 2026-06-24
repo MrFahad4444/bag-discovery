@@ -1,4 +1,4 @@
-import { QueryConstraint, where } from 'firebase/firestore';
+import { orderBy, QueryConstraint, where } from 'firebase/firestore';
 import {
     addDocument,
     getDocument,
@@ -21,7 +21,7 @@ const RESERVATIONS_PER_PAGE = 5;
  * @var RESERVATIONS_PER_PAGE - use this for items per page
  * @returns Paginated reservations list with next page info
  */
-export async function fetchUserReservationsPaginated(
+async function fetchUserReservationsPaginated(
     userId: string,
     pageNumber: number = 0
 ): Promise<{ reservations: Reservation[]; pageNumber: number; hasMore: boolean }> {
@@ -61,7 +61,7 @@ export async function fetchUserReservationsPaginated(
  *
  * @returns Newly created reservation object
  */
-export async function createReservation(
+async function createReservation(
     bagId: string,
     userId: string
 ): Promise<Reservation> {
@@ -91,12 +91,12 @@ export async function createReservation(
  *
  * @returns Array of reservations sorted by newest first
  */
-export async function fetchUserReservations(
+async function fetchUserReservations(
     userId: string
 ): Promise<Reservation[]> {
     const constraints: QueryConstraint[] = [
         where('userId', '==', userId),
-        // orderBy('createdAt', 'desc'),
+        orderBy('createdAt', 'desc'),
     ];
 
     const reservations = await getDocuments(
@@ -111,7 +111,8 @@ export async function fetchUserReservations(
         userId: item.userId,
         status: item.status,
         createdAt: item.createdAt,
-    })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+    }))
+    // .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
 }
 
 /**
@@ -125,7 +126,7 @@ export async function fetchUserReservations(
  * @param status - New reservation status
  * @param bagId - Related bag ID
  */
-export async function updateReservationStatus(
+async function updateReservationStatus(
     reservationId: string,
     status: Status,
     bagId: string
@@ -180,14 +181,14 @@ export async function updateReservationStatus(
  *
  * @returns Unsubscribe function
  */
-export function listenToUserReservations(
+function listenToUserReservations(
     userId: string,
     callback: (reservations: Reservation[]) => void,
     onError?: (error: Error) => void
 ): () => void {
     const constraints: QueryConstraint[] = [
         where('userId', '==', userId),
-        // orderBy('createdAt', 'desc'),
+        orderBy('createdAt', 'desc'),
     ];
 
     return listenToCollection(
@@ -199,7 +200,8 @@ export function listenToUserReservations(
                 userId: item.userId,
                 status: item.status,
                 createdAt: item.createdAt,
-            })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+            }))
+            // .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
 
             callback(reservations);
         },
@@ -207,3 +209,7 @@ export function listenToUserReservations(
         onError
     );
 }
+
+
+export { createReservation, fetchUserReservations, fetchUserReservationsPaginated, listenToUserReservations, updateReservationStatus };
+

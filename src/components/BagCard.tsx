@@ -39,6 +39,7 @@ export default function BagCard({ item }: { item: Bag }) {
                         <Image
                             source={{ uri: item.imageUrl }}
                             style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
+
                         />
                     </View>
 

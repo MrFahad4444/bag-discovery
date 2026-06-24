@@ -1,15 +1,26 @@
+import { updateBagQuantity } from '@/src/functions';
+import { useAuth, useBagListener, useCreateReservation, useTranslation } from '@/src/hooks';
 import { showLocalNotification } from '@/src/utils/utilNotification';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useAuth, useBag, useCreateReservation, useTranslation } from '../../src/hooks';
 
 export default function BagDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const { user } = useAuth();
-    const { data: bag, isLoading, error } = useBag(id || '');
+    const { bag, isLoading, error } = useBagListener(id || '');
     const { mutate: createReservation, isPending } = useCreateReservation();
     const router = useRouter();
     const { t, language } = useTranslation();
+    const quantity = bag?.quantityRemaining ?? 0;
+
+    useEffect(() => {
+        if (bag) {
+
+        }
+    }, [bag]);
+
 
     if (isLoading) {
         return (
@@ -35,13 +46,14 @@ export default function BagDetailScreen() {
         );
     }
 
+
     const handleReserve = () => {
         if (!user?.uid) {
             Alert.alert(t('error'), t('userNotAuthenticated'));
             return;
         }
 
-        if (bag.quantityRemaining === 0) {
+        if (quantity === 0) {
             Alert.alert(t('error'), t('noLongerAvailable'));
             return;
         }
@@ -63,6 +75,30 @@ export default function BagDetailScreen() {
         );
     };
 
+    const handleDecrement = async () => {
+        if (!bag) return;
+
+        const newQty = Math.max(0, bag.quantityRemaining - 1);
+
+        try {
+            await updateBagQuantity(bag.id, newQty);
+        } catch (error) {
+            console.error('Failed to decrement quantity:', error);
+        }
+    };
+
+    const handleIncrement = async () => {
+        if (!bag) return;
+
+        const newQty = bag.quantityRemaining + 1;
+
+        try {
+            await updateBagQuantity(bag.id, newQty);
+        } catch (error) {
+            console.error('Failed to increment quantity:', error);
+        }
+    };
+
     const pickupStartTime = new Date(bag.pickupStart.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const pickupEndTime = new Date(bag.pickupEnd.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const savingsAmount = bag.originalPriceSAR - bag.priceSAR;
@@ -80,7 +116,7 @@ export default function BagDetailScreen() {
             {/* Image banner stays fixed wrapper design */}
             <Image
                 source={{ uri: bag.imageUrl }}
-                className="w-full h-80 bg-gray-200"
+                className="w-full h-60 bg-gray-200"
             />
 
             {/* Content section uses pure flow mechanics from parent context */}
@@ -123,14 +159,39 @@ export default function BagDetailScreen() {
                     <Text className="text-lg font-bold text-gray-900 mb-4">{t('details')}</Text>
 
                     <View className="border-t border-gray-200">
-                        <View className="flex-row justify-between py-4 border-b border-gray-200">
+                        <View className="flex-row justify-between items-center py-4 border-b border-gray-200">
                             <Text className="text-gray-600">{t('quantityAvailable')}</Text>
-                            <Text className={`font-bold ${bag.quantityRemaining > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {bag.quantityRemaining} {t('bags')}
-                            </Text>
+                            <View className="flex-row items-center gap-3">
+                                <TouchableOpacity
+                                    onPress={handleDecrement}
+                                    disabled={quantity <= 1}
+                                    className={`p-1 rounded-lg ${quantity <= 1 ? 'bg-gray-200' : 'bg-blue-100'
+                                        }`}
+                                >
+                                    <MaterialIcons
+                                        name="remove"
+                                        size={20}
+                                        color={quantity <= 1 ? '#9CA3AF' : '#3B82F6'}
+                                    />
+                                </TouchableOpacity>
+                                <Text className={`font-bold ${quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {quantity} {t('bags')}
+                                </Text>
+                                <TouchableOpacity
+                                    onPress={handleIncrement}
+                                    className={`p-1 rounded-lg bg-blue-100`}
+                                >
+                                    <MaterialIcons
+                                        name="add"
+                                        size={20}
+                                        color={'#3B82F6'}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
                         </View>
 
-                        <View className="flex-row justify-between py-4 border-b border-gray-200">
+                        <View className="flex-row justify-between py-6 border-b border-gray-200">
                             <Text className="text-gray-600">{t('pickupWindow')}</Text>
                             <View>
                                 <Text className="font-semibold text-gray-900 text-sm">
@@ -139,7 +200,7 @@ export default function BagDetailScreen() {
                             </View>
                         </View>
 
-                        <View className="flex-row justify-between py-4">
+                        <View className="flex-row justify-between py-6">
                             <Text className="text-gray-600">{t('category')}</Text>
                             <Text className="font-semibold text-gray-900">
                                 {localizedCategory}
@@ -149,7 +210,7 @@ export default function BagDetailScreen() {
                 </View>
 
                 {/* Warning Notification Banner Box */}
-                {bag.quantityRemaining > 10 ? (
+                {quantity > 10 ? (
                     <View className="p-4 mb-8" />
                 ) : (
                     <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
@@ -162,8 +223,8 @@ export default function BagDetailScreen() {
                 {/* Reserve Action Button */}
                 <TouchableOpacity
                     onPress={handleReserve}
-                    disabled={isPending || bag.quantityRemaining === 0}
-                    className={`py-4 rounded-lg mb-3 ${bag.quantityRemaining === 0
+                    disabled={isPending || quantity === 0}
+                    className={`py-4 rounded-lg mb-3 ${quantity === 0
                         ? 'bg-gray-300'
                         : isPending
                             ? 'bg-blue-400'
@@ -171,7 +232,7 @@ export default function BagDetailScreen() {
                         }`}
                 >
                     <Text className="text-white text-center font-bold text-lg">
-                        {isPending ? t('reserving') : bag.quantityRemaining === 0 ? t('outOfStock') : t('reserveNow')}
+                        {isPending ? t('reserving') : quantity === 0 ? t('outOfStock') : t('reserveNow')}
                     </Text>
                 </TouchableOpacity>
 

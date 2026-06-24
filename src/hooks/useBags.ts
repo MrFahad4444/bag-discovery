@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { QueryConstraint, where } from 'firebase/firestore';
-import { fetchAllBags, fetchPaginatedBags, getBagById } from '../functions/funBags';
+import { useEffect, useState } from 'react';
+import { fetchAllBags, fetchPaginatedBags, getBagById, listenToBag } from '../functions/funBags';
 import { Bag, Category } from '../types';
 
 /**
@@ -68,5 +69,52 @@ function useBag(bagId: string) {
     });
 }
 
-export { useBag, useBags, useBagsInfinite };
+/**
+ * React hook that listens to a single bag document in real-time.
+ *
+ * Automatically subscribes to Firestore updates for the given bagId
+ * and keeps local state in sync with database changes.
+ *
+ * @param bagId - Unique ID of the bag to listen to
+ * @returns Object containing:
+ *  - bag: current bag data or null
+ *  - isLoading: loading state while listener initializes
+ *  - error: any Firestore listener error
+ */
+function useBagListener(bagId: string) {
+    const [bag, setBag] = useState<Bag | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        if (!bagId) {
+            setBag(null);
+            setError(null);
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        const unsubscribe = listenToBag(
+            bagId,
+            (updatedBag) => {
+                setBag(updatedBag);
+                setError(null);
+                setIsLoading(false);
+            },
+            (err) => {
+                setError(err);
+                setIsLoading(false);
+            }
+        );
+
+        return () => unsubscribe();
+    }, [bagId]);
+
+    return { bag, isLoading, error };
+}
+
+export { useBag, useBagListener, useBags, useBagsInfinite };
 

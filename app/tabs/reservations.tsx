@@ -1,5 +1,4 @@
 import { Status } from '@/src/types';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { EmptyListState, ReservationCard } from '../../src/components';
@@ -19,9 +18,6 @@ import { useAuth, useTranslation, useUpdateReservationStatus, useUserReservation
 export default function ReservationsScreen() {
     // Current authenticated user
     const { user } = useAuth();
-
-    // Navigation handler (future navigation support)
-    const router = useRouter();
 
     // Translation helper (i18n)
     const { t } = useTranslation();
@@ -112,7 +108,7 @@ export default function ReservationsScreen() {
                             onStatusChange={(status) =>
                                 handleStatusChange(item.id, item.bagId, status)
                             }
-                            isUpdating={updatingState.reservationId === item.id}
+                            // isUpdating={updatingState.reservationId === item.id}
                             updatingStatus={updatingState.status}
                         />
                     </View>

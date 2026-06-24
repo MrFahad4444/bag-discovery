@@ -13,6 +13,9 @@
     },
     "android": {
       "package": "com.assessment.bagdiscovery",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -42,13 +45,7 @@
         }
       ],
       "expo-localization",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/favicon.png",
-          "color": "#3B82F6"
-        }
-      ]
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,

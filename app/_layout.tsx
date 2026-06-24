@@ -1,11 +1,11 @@
 import { Header, LanguageToggle } from '@/src/components';
 import { useTranslation } from '@/src/hooks'; // 🌟 Added localization hook import
 import { LanguageProvider } from '@/src/provider/LanguageProvider';
+import { initNotifications } from '@/src/utils/utilNotification';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
+import { useEffect } from 'react';
 import '../global.css';
-
-import '@/src/utils/utilNotification';
 
 const queryClient = new QueryClient();
 
@@ -20,6 +20,10 @@ const queryClient = new QueryClient();
 function AppNavigator() {
     const { t } = useTranslation();
     const header = Header();
+
+    useEffect(() => {
+        initNotifications()
+    }, []);
 
     return (
         <Stack

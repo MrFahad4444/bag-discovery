@@ -77,7 +77,9 @@ export default function ReservationCard({
                     <View className="flex-row justify-between items-center pb-4 py-4">
                         <Text className="text-gray-600">{t('reservedAt')}</Text>
                         <Text className="font-semibold text-gray-900 text-sm">
-                            {new Date(reservation.createdAt.seconds * 1000).toLocaleDateString()}
+                            {reservation.createdAt && reservation.createdAt.seconds
+                                ? new Date(reservation.createdAt.seconds * 1000).toLocaleDateString()
+                                : 'N/A'}
                         </Text>
                     </View>
                 </View>

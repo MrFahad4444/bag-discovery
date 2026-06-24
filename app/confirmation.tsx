@@ -26,12 +26,21 @@ export default function ConfirmationScreen() {
 
     /**
     * Navigates user back to main reservation flow.
+    * Pops multiple screens to return to reservations context.
+    */
+    const handleGoToReservations = () => {
+        router.back();
+        router.back();
+        router.navigate('/tabs/reservations');
+    };
+
+    /**
+    * Navigates user back to main home screen.
     * Pops multiple screens to return to home context.
     */
-    const handleViewReservations = () => {
-        router.back(); // Pop confirmation
-        router.back(); // Pop detail screen
-        // router.push(''); // Go to reservations
+    const handleGoToHomeScreen = () => {
+        router.back();
+        router.back();
     };
 
     return (
@@ -61,10 +70,7 @@ export default function ConfirmationScreen() {
 
                 {/* Buttons */}
                 <TouchableOpacity
-                    onPress={() => {
-                        router.back();
-                        router.back();
-                    }}
+                    onPress={handleGoToHomeScreen}
                     className="w-full bg-blue-500 py-4 rounded-lg mb-3"
                 >
                     <Text className="text-white text-center font-semibold text-lg">
@@ -73,7 +79,7 @@ export default function ConfirmationScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={handleViewReservations}
+                    onPress={handleGoToReservations}
                     className="w-full bg-gray-200 py-4 rounded-lg"
                 >
                     <Text className="text-gray-900 text-center font-semibold text-lg">
