@@ -5,9 +5,18 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import '../global.css';
 
+import '@/src/utils/utilNotification';
+
 const queryClient = new QueryClient();
 
-// 🌟 Inner navigator component created to consume Context translation functions safely
+/**
+ * Main navigation stack for the application.
+ *
+ * Handles:
+ * - Screen registration (tabs, bag details, confirmation)
+ * - Dynamic localization for headers and titles
+ * - Global header configuration
+ */
 function AppNavigator() {
     const { t } = useTranslation();
     const header = Header();
@@ -23,11 +32,13 @@ function AppNavigator() {
                 },
             }}
         >
+            {/* Bottom tab navigator (main app entry) */}
             <Stack.Screen
                 name="tabs"
                 options={header({ title: t('bagDiscovery') })}
             />
 
+            {/* Bag detail screen */}
             <Stack.Screen
                 name="bag"
                 options={{
@@ -36,6 +47,7 @@ function AppNavigator() {
                 }}
             />
 
+            {/* Confirmation screen after actions */}
             <Stack.Screen
                 name="confirmation"
                 options={{
@@ -47,6 +59,14 @@ function AppNavigator() {
     );
 }
 
+/**
+ * Root layout of the application.
+ *
+ * Wraps the entire app with:
+ * - React Query (server state management)
+ * - Language Provider (i18n + RTL/LTR handling)
+ * - Navigation system (Expo Router stack)
+ */
 export default function RootLayout() {
     return (
         <QueryClientProvider client={queryClient}>

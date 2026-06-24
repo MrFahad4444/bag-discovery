@@ -54,5 +54,7 @@
     "myReservations": "My Reservations",
     "confirmation": "Confirmation",
     "home": "Home",
-    "maps": "Maps"
+    "maps": "Maps",
+    "errorLoadingBags": "Error loading bags",
+    "refresh": "Refresh"
 }

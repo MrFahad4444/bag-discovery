@@ -12,16 +12,22 @@ import {
     type QueryConstraint,
     type Unsubscribe
 } from 'firebase/firestore';
-import { handleTryCatch } from '../utils';
+import { withErrorHandling } from '../utils';
 import { db } from './firebase';
 
 
-// Gets one document by ID from a collection.
-export async function getDocument(
+/**
+ * Gets a single document by ID from Firestore collection.
+ *
+ * @param collectionName - Firestore collection name
+ * @param docId - Document ID
+ * @returns Document data or null if not found
+ */
+async function getDocument(
     collectionName: string,
     docId: string
 ): Promise<any | null> {
-    return handleTryCatch<any | null>(async () => {
+    return withErrorHandling<any | null>(async () => {
         const docRef = doc(db, collectionName, docId);
         const snapshot = await getDoc(docRef);
 
@@ -34,13 +40,20 @@ export async function getDocument(
     }, `Error getting document from ${collectionName}:`);
 }
 
-// Gets all documents from a collection, with optional query constraints.
-export async function getDocuments(
+/**
+ * Fetches all documents from a collection with optional query constraints.
+ *
+ * @param collectionName - Firestore collection name
+ * @param constraints - Firestore query constraints (where, orderBy, etc.)
+ * @param errorPrefix - Error log prefix for debugging
+ * @returns Array of documents
+ */
+async function getDocuments(
     collectionName: string,
     constraints: QueryConstraint[] = [],
     errorPrefix: string
 ): Promise<any[]> {
-    return handleTryCatch<any[]>(async () => {
+    return withErrorHandling<any[]>(async () => {
         const baseCollection = collection(db, collectionName);
 
         const collectionQuery =
@@ -57,14 +70,24 @@ export async function getDocuments(
     }, errorPrefix);
 }
 
-export async function getPaginatedDocuments(
+/**
+ * Fetches paginated documents from a collection using simple slicing.
+ *
+ * @param collectionName - Firestore collection name
+ * @param constraints - Query constraints for filtering
+ * @param pageNumber - Current page index
+ * @param pageSize - Number of items per page
+ * @param errorPrefix - Error log prefix for debugging
+ * @returns Array of paginated documents
+ */
+async function getPaginatedDocuments(
     collectionName: string,
     constraints: QueryConstraint[] = [],
     pageNumber: number = 0,
     pageSize: number = 10,
     errorPrefix: string
 ): Promise<any[]> {
-    return handleTryCatch<any[]>(async () => {
+    return withErrorHandling<any[]>(async () => {
         const baseCollection = collection(db, collectionName);
 
         const collectionQuery =
@@ -88,13 +111,20 @@ export async function getPaginatedDocuments(
     }, errorPrefix);
 }
 
-// Adds a new document and returns its generated ID.
-export async function addDocument<T extends object>(
+/**
+ * Adds a new document to Firestore and returns generated document ID.
+ *
+ * @param collectionName - Firestore collection name
+ * @param data - Document payload to store
+ * @param errorPrefix - Error log prefix for debugging
+ * @returns Newly created document ID
+ */
+async function addDocument<T extends object>(
     collectionName: string,
     data: T,
     errorPrefix: string
 ): Promise<string> {
-    return handleTryCatch<string>(async () => {
+    return withErrorHandling<string>(async () => {
         const docRef = doc(collection(db, collectionName));
 
         const dataToAdd = {
@@ -109,14 +139,22 @@ export async function addDocument<T extends object>(
     }, errorPrefix);
 }
 
-// Updates one document and adds an updatedAt timestamp.
-export async function updateDocument<T extends object>(
+/**
+ * Updates a document and adds server timestamp (updatedAt).
+ *
+ * @param collectionName - Firestore collection name
+ * @param docId - Document ID
+ * @param data - Partial fields to update
+ * @param errorPrefix - Error log prefix for debugging
+ * @returns void
+ */
+async function updateDocument<T extends object>(
     collectionName: string,
     docId: string,
     data: Partial<T>,
     errorPrefix: string,
 ): Promise<void> {
-    return handleTryCatch<void>(async () => {
+    return withErrorHandling<void>(async () => {
         const docRef = doc(db, collectionName, docId);
 
         const updateData = {
@@ -128,8 +166,14 @@ export async function updateDocument<T extends object>(
     }, errorPrefix);
 }
 
-// Deletes one document by ID from a collection.
-export async function deleteDocument(
+/**
+ * Deletes a document from Firestore by ID.
+ *
+ * @param collectionName - Firestore collection name
+ * @param docId - Document ID
+ * @returns void
+ */
+async function deleteDocument(
     collectionName: string,
     docId: string
 ): Promise<void> {
@@ -143,8 +187,16 @@ export async function deleteDocument(
     }
 }
 
-// Listens to one document and sends changes to the callback.
-export function listenToDocument(
+/**
+ * Listens to a single Firestore document in real-time.
+ *
+ * @param collectionName - Firestore collection name
+ * @param docId - Document ID
+ * @param callback - Emits document updates
+ * @param onError - Optional error handler
+ * @returns Unsubscribe function
+ */
+function listenToDocument(
     collectionName: string,
     docId: string,
     callback: (data: any | null) => void,
@@ -175,8 +227,16 @@ export function listenToDocument(
     );
 }
 
-// Listens to a collection query and sends changes to the callback.
-export function listenToCollection(
+/**
+ * Listens to a Firestore collection in real-time with optional filters.
+ *
+ * @param collectionName - Firestore collection name
+ * @param callback - Emits array of documents on change
+ * @param constraints - Query filters (optional)
+ * @param onError - Optional error handler
+ * @returns Unsubscribe function
+ */
+function listenToCollection(
     collectionName: string,
     callback: (docs: any[]) => void,
     constraints: QueryConstraint[] = [],
@@ -209,15 +269,26 @@ export function listenToCollection(
         }
     );
 }
-// Updates multiple fields on one document without adding timestamps.
-export async function batchUpdateDocument<T extends object>(
+
+/**
+ * Updates specific fields of a document without timestamps.
+ *
+ * @param collectionName - Firestore collection name
+ * @param docId - Document ID
+ * @param updates - Partial update payload
+ * @returns void
+ */
+async function batchUpdateDocument<T extends object>(
     collectionName: string,
     docId: string,
     updates: Partial<T>
 ): Promise<void> {
-    return handleTryCatch<void>(async () => {
+    return withErrorHandling<void>(async () => {
         const docRef = doc(db, collectionName, docId);
 
         await updateDoc(docRef, updates as any);
     }, `Error batch updating document in ${collectionName}:`);
 }
+
+export { addDocument, batchUpdateDocument, deleteDocument, getDocument, getDocuments, getPaginatedDocuments, listenToCollection, listenToDocument, updateDocument };
+

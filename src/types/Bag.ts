@@ -1,12 +1,16 @@
 import { Timestamp } from 'firebase/firestore';
-import { Category, Languages } from './Common';
+import { Category } from './common';
+import { Languages } from './language';
 
-export type Bag = {
+/**
+ * Represents a food bag listed by a restaurant.
+ */
+type Bag = {
     id: string;
     restaurantId: string;
     restaurantName: string;
-    name: Languages; // Languages from Common Types
-    category: Category; // Category from Common Types
+    name: Languages;
+    category: Category;
     priceSAR: number;
     originalPriceSAR: number;
     quantityRemaining: number;
@@ -15,3 +19,28 @@ export type Bag = {
     imageUrl: string;
     createdAt: Timestamp;
 };
+
+/**
+ * Creates a new bag object by merging existing
+ * values with partial updates.
+ *
+ * Useful for immutable state updates while keeping
+ * object modification predictable and readable.
+ *
+ * @param bag - Original bag object
+ * @param updates - Partial fields to override
+ *
+ * @returns Updated bag object
+ */
+function bagCopyWith(
+    bag: Bag,
+    updates: Partial<Bag>
+): Bag {
+    return {
+        ...bag,
+        ...updates,
+    };
+}
+
+export { Bag, bagCopyWith };
+

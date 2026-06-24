@@ -1,4 +1,27 @@
-export type Category = 'bakery' | 'restaurant' | 'grocery'; //Separate Category Type, So it can be use multiple time
+/**
+ * Supported food bag categories available in the application.
+ *
+ * Used for:
+ * - filtering
+ * - categorization
+ * - search/grouping
+ * - UI badges/tags
+ */
+type Category =
+    | 'bakery'
+    | 'restaurant'
+    | 'grocery';
 
-export type Status = 'pending' | 'confirmed' | 'cancelled'; //Separate Status Type can be used multiple times.
+/**
+ * Reservation lifecycle states.
+ *
+ * pending   -> Reservation created but not yet confirmed
+ * confirmed -> Reservation accepted/active
+ * cancelled -> Reservation was cancelled by user or system
+ */
+type Status =
+    | 'pending'
+    | 'confirmed'
+    | 'cancelled';
 
+export type { Category, Status };

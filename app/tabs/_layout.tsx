@@ -3,12 +3,27 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 
+/**
+ * Bottom tab navigation layout for the main app sections.
+ *
+ * Includes:
+ * - Home (bag discovery)
+ * - Reservations
+ * - Maps view
+ *
+ * Also handles platform-specific tab bar sizing
+ * for better UI consistency on Android vs iOS.
+ */
 export default function TabLayout() {
     const { t } = useTranslation();
 
+    /**
+     * Adjust tab bar height dynamically for newer Android versions.
+     */
     const isAndroid15OrHigher =
         Platform.OS === 'android' && Number(Platform.Version) >= 35;
 
+    const tabHeight = isAndroid15OrHigher ? 80 : 60;
     const paddingBottom = isAndroid15OrHigher ? 24 : 8;
 
     return (
@@ -25,13 +40,13 @@ export default function TabLayout() {
                     backgroundColor: '#FFFFFF',
                     borderTopWidth: 1,
                     borderTopColor: '#E5E7EB',
-                    height: 60,
+                    height: tabHeight,
                     paddingBottom: paddingBottom,
                     paddingTop: 8,
                 },
             }}
         >
-            {/* 1. Discover Bags Screen */}
+            {/* Bag Discovery */}
             <Tabs.Screen
                 name="home"
                 options={{
@@ -42,7 +57,7 @@ export default function TabLayout() {
                 }}
             />
 
-            {/* 2. Reservations List Screen */}
+            {/* User reservations list */}
             <Tabs.Screen
                 name="reservations"
                 options={{
@@ -53,7 +68,7 @@ export default function TabLayout() {
                 }}
             />
 
-            {/* 3. Maps / Discovery View Screen */}
+            {/* Map */}
             <Tabs.Screen
                 name="maps"
                 options={{

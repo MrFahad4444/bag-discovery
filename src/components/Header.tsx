@@ -4,6 +4,20 @@ import { Stack } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 
+/**
+ * Custom Component that generates localized Stack screen headers
+ * with built-in RTL/LTR support and language toggle integration.
+ *
+ * Designed for Expo Router Stack screens to:
+ * - automatically align header based on language direction
+ * - place LanguageToggle on correct side (RTL/LTR aware)
+ * - allow external override of default header options
+ *
+ * @returns Function that builds Stack.Screen header options
+ *
+ * @param title - Screen title displayed in the header
+ * @param options - Optional overrides for Stack.Screen header configuration
+ */
 interface LocalizedHeaderProps {
     title: string;
     options?: React.ComponentProps<typeof Stack.Screen>['options'];
@@ -20,8 +34,8 @@ export default function useLocalizedHeader() {
             headerTitleAlign: 'center' as const, // Keeps title locked in the center
 
             // Render the toggle on the Left for Arabic (RTL) or Right for English (LTR)
-            headerLeft: isRTL ? () => <View className="pl-4"><LanguageToggle /></View> : undefined,
-            headerRight: !isRTL ? () => <View className="pr-4"><LanguageToggle /></View> : undefined,
+            headerLeft: isRTL ? () => <View ><LanguageToggle /></View> : undefined,
+            headerRight: !isRTL ? () => <View ><LanguageToggle /></View> : undefined,
 
             ...options, // Keeps external layout option overrides working perfectly
         };

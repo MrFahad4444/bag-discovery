@@ -12,6 +12,19 @@ type EmptyStateOptions<T> = {
     onButtonPress?: () => void;
 };
 
+/**
+ * Generic UI state handler for list screens.
+ *
+ * Handles three common states in one reusable component:
+ * - Loading state (spinner)
+ * - Error state (error message)
+ * - Empty state (no data fallback UI)
+ *
+ * Designed to simplify screen logic by removing repeated
+ * conditional rendering from individual screens.
+ *
+ * @template T - Type of list data items
+ */
 export default function EmptyListState<T>({
     loading,
     error,

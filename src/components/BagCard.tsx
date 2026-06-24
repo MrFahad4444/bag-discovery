@@ -5,6 +5,17 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../hooks'; // Check path accuracy
 import { Bag } from '../types';
 
+/**
+ * Displays a bag card used in listings and home screens.
+ *
+ * This component:
+ * - Renders bag image, name, category, and pricing info
+ * - Formats pickup time from Firestore timestamps
+ * - Supports localization (English / Arabic)
+ * - Navigates to bag details screen on press
+ *
+ * @param item - Bag data object containing all display information
+ */
 export default function BagCard({ item }: { item: Bag }) {
     const { t, language } = useTranslation(); // Dichted isRTL flag layout rules completely
 

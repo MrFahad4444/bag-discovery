@@ -1,4 +1,4 @@
-import { BagCard } from '@/src/components';
+import { BagCard, EmptyListState } from '@/src/components';
 import { useTranslation } from '@/src/hooks';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useBagsInfinite } from '@/src/hooks/useBags';
@@ -6,11 +6,23 @@ import { useState } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Category } from '../../src/types';
 
-export default function ListScreen() {
-  const { user, loading } = useAuth();
+/**
+ * Home screen (Bag listing page)
+ *
+ * Responsibilities:
+ * - Displays list of available bags
+ * - Supports category filtering
+ * - Handles infinite scroll pagination
+ * - Shows loading / empty / error states
+ */
+export default function Home() {
+  const { loading } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>();
-  const { t, isRTL } = useTranslation();
+  const { t } = useTranslation();
 
+  /**
+   * Fetch paginated bags with optional category filter.
+   */
   const {
     data,
     isLoading,
@@ -20,39 +32,48 @@ export default function ListScreen() {
     isFetchingNextPage,
   } = useBagsInfinite(selectedCategory);
 
-  // Flatten all pages into single array
+  /**
+   * Merge all paginated results into a single list.
+   */
   const bags = data?.pages.flatMap(page => page.bags) ?? [];
 
+  /**
+   * Trigger next page when user reaches end of list.
+   */
   const handleEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   };
 
-  if (loading || isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" color="#3B82F6" />
-      </View>
-    );
+  /**
+   * Centralized UI handler for loading, error, and empty states.
+   *
+   * Keeps screen components clean by removing repeated UI logic
+   * for common data states like loading, error, and empty list.
+   *
+   * Returns a React element (or null when data exists).
+   */
+  const stateView = EmptyListState({
+    loading: loading || isLoading,
+    error,
+    data: bags,
+
+    emptyMessage: t('noBagsFound'),
+    errorMessage: t('errorLoadingBags'),
+
+    buttonText: t('refresh'),
+    onButtonPress: () => { },
+  });
+
+
+  if (stateView) {
+    return stateView;
   }
 
-  if (error) {
-    return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
-        <Text className="text-red-500 text-center text-lg">Error loading bags</Text>
-      </View>
-    );
-  }
-
-  if (!bags || bags.length === 0) {
-    return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
-        <Text className="text-gray-500 text-lg">No bags available</Text>
-      </View>
-    );
-  }
-
+  /**
+   * Available filter categories
+   */
   const categories: (Category | undefined)[] = [undefined, 'bakery', 'restaurant', 'grocery'];
 
   return (

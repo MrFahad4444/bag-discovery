@@ -8,12 +8,19 @@ import {
     updateDocument
 } from '../services/firestore';
 import { Bag, Reservation, Status } from '../types';
-import { handleTryCatch } from '../utils';
+import { withErrorHandling } from '../utils';
 
 
 const RESERVATIONS_PER_PAGE = 5;
 
-// Get paginated user reservations
+/**
+ * Fetch paginated reservations for a specific user.
+ *
+ * @param userId - User ID to filter reservations
+ * @param pageNumber - Current page index for pagination
+ * @var RESERVATIONS_PER_PAGE - use this for items per page
+ * @returns Paginated reservations list with next page info
+ */
 export async function fetchUserReservationsPaginated(
     userId: string,
     pageNumber: number = 0
@@ -46,7 +53,14 @@ export async function fetchUserReservationsPaginated(
 }
 
 
-// Create reservation
+/**
+ * Creates a new reservation for a user and bag.
+ *
+ * @param bagId - Bag being reserved
+ * @param userId - User creating reservation
+ *
+ * @returns Newly created reservation object
+ */
 export async function createReservation(
     bagId: string,
     userId: string
@@ -70,7 +84,13 @@ export async function createReservation(
     };
 }
 
-// Get user reservations
+/**
+ * Fetch all reservations for a user (non-paginated).
+ *
+ * @param userId - User ID
+ *
+ * @returns Array of reservations sorted by newest first
+ */
 export async function fetchUserReservations(
     userId: string
 ): Promise<Reservation[]> {
@@ -94,13 +114,23 @@ export async function fetchUserReservations(
     })).sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
 }
 
-
+/**
+ * Updates reservation status and syncs related bag quantity.
+ *
+ * Rules:
+ * - confirmed → decreases bag quantity
+ * - pending → restores bag quantity (refund logic)
+ *
+ * @param reservationId - Reservation document ID
+ * @param status - New reservation status
+ * @param bagId - Related bag ID
+ */
 export async function updateReservationStatus(
     reservationId: string,
     status: Status,
     bagId: string
 ): Promise<void> {
-    return handleTryCatch(
+    return withErrorHandling(
         async () => {
             // Get current bag directly by document ID (not querying by 'id' field)
             const bag = await getDocument('bags', bagId);
@@ -141,7 +171,15 @@ export async function updateReservationStatus(
     );
 }
 
-// Listen to user reservations
+/**
+ * Real-time listener for user reservations.
+ *
+ * @param userId - User ID to listen for
+ * @param callback - Emits updated reservation list
+ * @param onError - Optional error handler
+ *
+ * @returns Unsubscribe function
+ */
 export function listenToUserReservations(
     userId: string,
     callback: (reservations: Reservation[]) => void,

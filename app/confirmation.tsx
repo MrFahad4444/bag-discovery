@@ -3,14 +3,31 @@ import { useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useAuth, useTranslation, useUserReservations } from '../src/hooks'; // 🌟 Imported useTranslation
 
+/**
+ * Confirmation screen shown after a reservation is successfully created.
+ *
+ * Displays:
+ * - Success message
+ * - Latest reservation details
+ * - Navigation actions (back / view all reservations)
+ */
 export default function ConfirmationScreen() {
     const { t } = useTranslation(); // 🌟 Destructured your flat translation tool
     const { user } = useAuth();
+
+    /**
+     * Fetch all user reservations and pick the latest one
+     * to show quick confirmation feedback.
+     */
     const { data: reservations = [] } = useUserReservations(user?.uid || '');
     const router = useRouter();
 
     const latestReservation = reservations[0];
 
+    /**
+    * Navigates user back to main reservation flow.
+    * Pops multiple screens to return to home context.
+    */
     const handleViewReservations = () => {
         router.back(); // Pop confirmation
         router.back(); // Pop detail screen

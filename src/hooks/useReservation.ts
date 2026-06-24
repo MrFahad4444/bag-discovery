@@ -3,7 +3,13 @@ import { useEffect, useState } from 'react';
 import { createReservation, fetchUserReservations, listenToUserReservations, updateReservationStatus } from '../functions/funReservations';
 import { Reservation, Status } from '../types';
 
-// Create a reservation
+/**
+ * Creates a new reservation mutation.
+ *
+ * React Query Mutation:
+ * - mutationFn handles reservation creation
+ * - manages loading and error mutation states
+ */
 function useCreateReservation() {
     return useMutation({
         mutationFn: ({ bagId, userId }: { bagId: string; userId: string }) =>
@@ -11,7 +17,16 @@ function useCreateReservation() {
     });
 }
 
-// Fetch user's reservations (simple)
+/**
+ * Fetches all reservations belonging to a user.
+ *
+ * @param userId - Current authenticated user ID
+ *
+ * React Query:
+ * - queryKey caches reservations per user
+ * - queryFn handles reservation fetching
+ * - staleTime controls cache freshness
+ */
 function useUserReservations(userId: string) {
     return useQuery({
         queryKey: ['reservations', userId],
@@ -20,6 +35,14 @@ function useUserReservations(userId: string) {
     });
 }
 
+/**
+ * Updates reservation status and refreshes
+ * related reservation queries automatically.
+ *
+ * React Query Mutation:
+ * - mutationFn handles reservation updates
+ * - onSuccess refreshes cached queries
+ */
 function useUpdateReservationStatus() {
     const queryClient = useQueryClient();
 
@@ -42,6 +65,14 @@ function useUpdateReservationStatus() {
     });
 }
 
+/**
+ * Real-time reservation listener hook.
+ *
+ * @param userId - Current authenticated user ID
+ *
+ * Uses Firestore snapshot listeners to keep
+ * reservation data synced in real time.
+ */
 function useUserReservationsListener(userId: string) {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [loading, setLoading] = useState(true);

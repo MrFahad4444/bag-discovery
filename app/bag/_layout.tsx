@@ -1,6 +1,12 @@
 import { LanguageToggle } from '@/src/components';
 import { Stack } from 'expo-router';
 
+/**
+ * Layout configuration for the Bag feature routes.
+ *
+ * This stack handles all bag-related screens,
+ * currently focused on the dynamic [id] detail screen.
+ */
 export default function BagLayout() {
     return (
         <Stack>
@@ -14,6 +20,7 @@ export default function BagLayout() {
                     headerTitleStyle: {
                         fontWeight: '600',
                     },
+                    // Language switch stays available in header
                     headerRight: () => <>
                         <LanguageToggle />
                     </>,

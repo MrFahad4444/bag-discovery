@@ -1,3 +1,4 @@
+import { showLocalNotification } from '@/src/utils/utilNotification';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth, useBag, useCreateReservation, useTranslation } from '../../src/hooks';
@@ -49,6 +50,10 @@ export default function BagDetailScreen() {
             { bagId: bag.id, userId: user.uid },
             {
                 onSuccess: () => {
+                    showLocalNotification(
+                        t('reservationConfirmed'),   // "Reservation Confirmed!" or "تم تأكيد الحجز!"
+                        t('reservationSuccessMsg')   // "Your bag has been reserved..." or "تم حجز كيسك بنجاح."
+                    );
                     router.push('/confirmation');
                 },
                 onError: (error: Error) => {
@@ -159,10 +164,10 @@ export default function BagDetailScreen() {
                     onPress={handleReserve}
                     disabled={isPending || bag.quantityRemaining === 0}
                     className={`py-4 rounded-lg mb-3 ${bag.quantityRemaining === 0
-                            ? 'bg-gray-300'
-                            : isPending
-                                ? 'bg-blue-400'
-                                : 'bg-blue-500'
+                        ? 'bg-gray-300'
+                        : isPending
+                            ? 'bg-blue-400'
+                            : 'bg-blue-500'
                         }`}
                 >
                     <Text className="text-white text-center font-bold text-lg">

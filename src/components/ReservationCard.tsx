@@ -11,6 +11,23 @@ interface ReservationCardProps {
     updatingStatus?: 'confirmed' | 'cancelled' | 'pending' | null;
 }
 
+
+/**
+ * Displays a reservation card with full reservation details
+ * and optional action buttons for status management.
+ *
+ * @param reservation - Reservation data to render in the card
+ * @param isHistory - Enables action buttons (confirm / cancel / refund) view
+ * @param onStatusChange - Callback fired when user changes reservation status
+ * @param isUpdating - Shows loading state when a status update is in progress
+ * @param updatingStatus - Tracks which status action is currently loading
+ *
+ * Features:
+ * - Shows reservation ID, bag ID, status, and creation date
+ * - Color-coded status display (pending / confirmed / cancelled)
+ * - Optional history mode with action buttons
+ * - Loading states for async status updates
+ */
 export default function ReservationCard({
     reservation,
     isHistory = false,
