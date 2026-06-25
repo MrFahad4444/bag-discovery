@@ -153,7 +153,7 @@ firebase login
 After logging in, select your project. If you know your project name, use:
 
 ```bash
-firebase use <YOUR_PROJECT_NAME>
+firebase use <YOUR_PROJECT_ID>
 ```
 
 **If you're unsure of your project name**, list all available projects:
@@ -165,7 +165,7 @@ firebase projects:list
 Then select your project from the list:
 
 ```bash
-firebase use <YOUR_PROJECT_NAME>
+firebase use <YOUR_PROJECT_ID>
 ```
 
 Or Use this command to get all projects and select from the list:
