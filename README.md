@@ -168,12 +168,6 @@ Then select your project from the list:
 firebase use <YOUR_PROJECT_NAME>
 ```
 
-Finally, deploy:
-
-```bash
-firebase deploy
-```
-
 ---
 
 ### Step 5 — Enable Firestore Database (REQUIRED)
@@ -200,6 +194,14 @@ firebase init firestore
 ---
 
 ✔ Firestore is now active and ready to store data.
+
+---
+
+Finally, deploy:
+
+```bash
+firebase deploy
+```
 
 ---
 
