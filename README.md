@@ -30,7 +30,7 @@ yarn
 ```bash
 npx expo start
 or
-npm run tunnel (if expo start have any issue with local host)
+npm run tunnel (if expo start has any issue with localhost)
 ```
 
 ---
@@ -84,60 +84,62 @@ Enable APIs:
 
 - Maps SDK for Android
 - Maps SDK for iOS
-and then create ApiKey and allow these 2 apis into that key
+- Then create an API Key and allow these 2 APIs into that key
 
 ⚠️ If not enabled → map will be blank even with correct keys.
-or
-You can use a demo key for testing from here:
+
+**Or use a demo key for testing:**
 <https://mapsplatform.google.com/maps-demo-key/>
+
 ---
 
-# ⚙️ 3. Expo Config Setup
+# ☁️ 3. Firebase Setup
 
-This project uses `app.config.js` (NOT app.json)
+Go to Firebase Console:
+<https://console.firebase.google.com/>
 
-```js
-import 'dotenv/config';
+### Step 1 — Create a New Project
 
-export default {
-  expo: {
-    name: "bag-discovery",
-    slug: "bag-discovery",
+1. Click **Create a project**
+2. Enter project name: `bag-discovery`
+3. Accept terms and click **Continue**
+4. Disable Google Analytics (optional) and click **Create project**
 
-    ios: {
-      config: {
-        googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY,
-      },
-    },
+---
 
-    android: {
-      config: {
-        googleMaps: {
-          apiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY,
-        },
-      },
-    },
-  },
-};
+### Step 2 — Add Web App
+
+1. Click the **Web icon** (</>) in the project overview
+2. Enter app nickname: `bag-discovery-web`
+3. Click **Register app**
+4. Copy the Firebase config object
+
+---
+
+### Step 3 — Add Credentials to `.env.local`
+
+Paste the copied credentials into your `.env.local` file:
+
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=your_apiKey
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_authDomain
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_projectId
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storageBucket
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messagingSenderId
+EXPO_PUBLIC_FIREBASE_APP_ID=your_appId
 ```
 
 ---
 
-# ☁️ 4. Firebase Setup
-
-## Login
+### Step 4 — Login & Deploy
 
 ```bash
 firebase login
 ```
 
-## Select project
-
 ```bash
-firebase use <YOUR_PROJECT_ID>
+firebase use bag-discovery
 ```
-
-## Deploy rules + indexes
 
 ```bash
 firebase deploy
@@ -145,11 +147,11 @@ firebase deploy
 
 ---
 
-✔ No manual Firestore setup required
+✔ Firestore and deployment will be handled automatically
 
 ---
 
-# 🌱 5. Seed Database
+# 🌱 4. Seed Database
 
 ```bash
 npx ts-node src/scripts/seed.ts
@@ -157,7 +159,7 @@ npx ts-node src/scripts/seed.ts
 
 ---
 
-# 🧱 6. Project Structure
+# 🧱 5. Project Structure
 
 app/ → Screens  
 src/components/ → UI  
@@ -169,7 +171,7 @@ assets/ → Images
 
 ---
 
-# 🧠 7. Architecture Decisions
+# 🧠 6. Architecture Decisions
 
 - Firebase Firestore for real-time sync  
 - Map clustering for performance  
@@ -179,7 +181,7 @@ assets/ → Images
 
 ---
 
-# 🚨 8. Known Issues
+# 🚨 7. Known Issues
 
 - No geo-radius backend filtering  
 - iOS needs proper dev build setup  
@@ -188,12 +190,12 @@ assets/ → Images
 
 ---
 
-# ⏱️ 9. Time Spent
+# ⏱️ 8. Time Spent
 
 ~X hours total
 
 ---
 
-# 👨‍💻 Author
+# 👨‍💻 9. Author
 
 Built with Expo + React Native + Firebase
