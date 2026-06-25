@@ -9,7 +9,7 @@ A React Native (Expo) application that allows users to discover and reserve surp
 ## 📥 Clone Repository
 
 ```bash
-git clone <YOUR_REPO_URL>
+git clone https://github.com/MrFahad4444/bag-discovery
 cd bag-discovery
 ```
 
@@ -19,6 +19,8 @@ cd bag-discovery
 
 ```bash
 npm install
+or
+yarn
 ```
 
 ---
@@ -27,6 +29,8 @@ npm install
 
 ```bash
 npx expo start
+or
+npm run tunnel (if expo start have any issue with local host)
 ```
 
 ---
@@ -80,9 +84,12 @@ Enable APIs:
 
 - Maps SDK for Android
 - Maps SDK for iOS
+and then create ApiKey and allow these 2 apis into that key
 
 ⚠️ If not enabled → map will be blank even with correct keys.
-
+or
+You can use a demo key for testing from here:
+<https://mapsplatform.google.com/maps-demo-key/>
 ---
 
 # ⚙️ 3. Expo Config Setup
