@@ -54,8 +54,8 @@ const db = getFirestore(app);
 /**
  * Riyadh center coordinates.
  */
-const RIYADH_LAT = 24.7136;
-const RIYADH_LNG = 46.6753;
+const MY_LAT = 24.7136;
+const MY_LNG = 46.6753;
 
 /**
  * Generates random nearby coordinates around Riyadh.
@@ -115,8 +115,8 @@ async function seedDatabase(): Promise<void> {
                 id: docRef.id,
                 ...bag,
                 ...generateNearbyCoordinate(
-                    RIYADH_LAT,
-                    RIYADH_LNG
+                    MY_LAT,
+                    MY_LNG
                 ),
             });
         });
