@@ -211,30 +211,7 @@ firebase deploy
 
 ---
 
-### Step 7 — Seed Database (REQUIRED)
-
-⚠️ **IMPORTANT**: You MUST update the coordinates before seeding, or bags will appear at a different location.
-
-Open `src/scripts/seed.ts` and update the following coordinates to your location:
-
-```typescript
-const MY_LAT = 24.7136;  // ⚠️ REQUIRED: Replace with your latitude
-const MY_LNG = 46.6753;  // ⚠️ REQUIRED: Replace with your longitude
-```
-
-**Example coordinates shown are for Riyadh, Saudi Arabia. Without updating these, bags will appear at this default location instead of near you.**
-
-Once you've updated your coordinates, run:
-
-```bash
-npx ts-node src/scripts/seed.ts
-```
-
-✔ This will populate Firestore with bag data near your specified location.
-
----
-
-### Step 6 — Enable Anonymous Authentication (REQUIRED)
+### Step 7 — Enable Anonymous Authentication (REQUIRED)
 
 The app uses anonymous authentication to allow users to access the app without creating an account. You must enable this in Firebase before seeding.
 
@@ -261,7 +238,30 @@ Select **Anonymous** when prompted.
 
 ---
 
-# 🧱 5. Project Structure
+### Step 8 — Seed Database (REQUIRED)
+
+⚠️ **IMPORTANT**: You MUST update the coordinates before seeding, or bags will appear at a different location.
+
+Open `src/scripts/seed.ts` and update the following coordinates to your location:
+
+```typescript
+const MY_LAT = 24.7136;  // ⚠️ REQUIRED: Replace with your latitude
+const MY_LNG = 46.6753;  // ⚠️ REQUIRED: Replace with your longitude
+```
+
+**Example coordinates shown are for Riyadh, Saudi Arabia. Without updating these, bags will appear at this default location instead of near you.**
+
+Once you've updated your coordinates, run:
+
+```bash
+npx ts-node src/scripts/seed.ts
+```
+
+✔ This will populate Firestore with bag data near your specified location.
+
+---
+
+# 🧱 Project Structure
 
 ```
 app/                  → Screens
@@ -276,7 +276,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 🧠 6. Architecture Decisions
+# 🧠 Architecture Decisions
 
 - **Language Provider**: Wraps the entire app. When the language preference is switched, the entire application re-renders without requiring a full reload.
 - **Firestore Indexes**: Implemented for efficient compound queries.
@@ -288,7 +288,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 💡 7. Future Improvements
+# 💡 Future Improvements
 
 - Refine and improve the UI/UX design
 - Fix Google Maps clustering behavior—markers sometimes disappear at certain zoom levels
@@ -299,7 +299,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 🚨 8. Known Issues
+# 🚨 Known Issues
 
 - No geo-radius backend filtering implemented
 - iOS requires proper development build configuration
@@ -311,7 +311,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 📊 9. Firestore Indexes
+# 📊 Firestore Indexes
 
 The following composite index is required for efficient querying:
 
@@ -336,12 +336,12 @@ This index optimizes queries filtering reservations by user ID and ordering by c
 
 ---
 
-# ⏱️ 10. Time Spent
+# ⏱️ Time Spent
 
 Approximately 2.5 days of development
 
 ---
 
-# 👨‍💻 11. Author
+# 👨‍💻 Author
 
 Built with Expo, React Native, and Firebase by Muhammad Fahad
