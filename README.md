@@ -1,50 +1,192 @@
-# Welcome to your Expo app 👋
+# 🛍️ Bag Discovery App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native (Expo) application that allows users to discover and reserve surplus food bags from restaurants, bakeries, and grocery stores using an interactive map with clustering and Firebase backend.
 
-## Get started
+---
 
-1. Install dependencies
+# 🚀 1. Setup Instructions
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## 📥 Clone Repository
 
 ```bash
-npm run reset-project
+git clone <YOUR_REPO_URL>
+cd bag-discovery
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 📦 Install Dependencies
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm install
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## ▶️ Start Development Server
 
-Join our community of developers creating universal apps.
+```bash
+npx expo start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+You can run the app using:
+
+- 📱 Expo Go (limited support for maps)
+- 🤖 Android Emulator
+- 🍎 iOS Simulator
+- ⚡ Development Build (recommended)
+
+Docs:
+<https://docs.expo.dev>
+
+---
+
+# 🔐 2. Environment Setup
+
+This project uses `.env.local` for all secrets.
+
+---
+
+## Step 1 — Rename file
+
+```bash
+.env.example → .env.local
+```
+
+---
+
+## Step 2 — Fill values
+
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=your_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_bucket
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+
+GOOGLE_MAPS_ANDROID_API_KEY=your_android_key
+GOOGLE_MAPS_IOS_API_KEY=your_ios_key
+```
+
+---
+
+## 🗺️ Google Maps Setup (REQUIRED)
+
+Enable APIs:
+<https://console.cloud.google.com/apis/library>
+
+- Maps SDK for Android
+- Maps SDK for iOS
+
+⚠️ If not enabled → map will be blank even with correct keys.
+
+---
+
+# ⚙️ 3. Expo Config Setup
+
+This project uses `app.config.js` (NOT app.json)
+
+```js
+import 'dotenv/config';
+
+export default {
+  expo: {
+    name: "bag-discovery",
+    slug: "bag-discovery",
+
+    ios: {
+      config: {
+        googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY,
+      },
+    },
+
+    android: {
+      config: {
+        googleMaps: {
+          apiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY,
+        },
+      },
+    },
+  },
+};
+```
+
+---
+
+# ☁️ 4. Firebase Setup
+
+## Login
+
+```bash
+firebase login
+```
+
+## Select project
+
+```bash
+firebase use <YOUR_PROJECT_ID>
+```
+
+## Deploy rules + indexes
+
+```bash
+firebase deploy
+```
+
+---
+
+✔ No manual Firestore setup required
+
+---
+
+# 🌱 5. Seed Database
+
+```bash
+npx ts-node src/scripts/seed.ts
+```
+
+---
+
+# 🧱 6. Project Structure
+
+app/ → Screens  
+src/components/ → UI  
+src/functions/ → Firebase logic  
+src/hooks/ → Hooks  
+src/utils/ → Helpers  
+src/types/ → Types  
+assets/ → Images  
+
+---
+
+# 🧠 7. Architecture Decisions
+
+- Firebase Firestore for real-time sync  
+- Map clustering for performance  
+- Latitude/longitude stored directly  
+- Expo Router for navigation  
+- Marker optimization with tracksViewChanges  
+
+---
+
+# 🚨 8. Known Issues
+
+- No geo-radius backend filtering  
+- iOS needs proper dev build setup  
+- Clustering varies at extreme zoom  
+- No authentication  
+
+---
+
+# ⏱️ 9. Time Spent
+
+~X hours total
+
+---
+
+# 👨‍💻 Author
+
+Built with Expo + React Native + Firebase
