@@ -170,11 +170,23 @@ firebase use <YOUR_PROJECT_NAME>
 
 ---
 
-### Enable Firestore Database (REQUIRED)
+### Step 5 — Enable Firestore Database (REQUIRED)
 
-Before the app can store and retrieve data, you must enable Firestore in your Firebase project.
+Before deploying, you must initialize Firestore in your Firebase project. The deploy command will fail without this.
 
-**Option 1: Enable via Firebase Console (Recommended)**
+**Option 1: Enable via CLI (Recommended)**
+
+Initialize Firestore using the Firebase CLI:
+
+```bash
+firebase init firestore
+```
+
+Follow the prompts to set up Firestore rules and indexes.
+
+**Option 2: Enable via Firebase Console**
+
+Alternatively, you can enable Firestore manually:
 
 1. Go to Firebase Console: <https://console.firebase.google.com/>
 2. Select your project
@@ -183,21 +195,15 @@ Before the app can store and retrieve data, you must enable Firestore in your Fi
 5. Choose **Start in production mode** or **Start in test mode**
 6. Select your region and click **Enable**
 
-**Option 2: Enable via CLI**
+---
 
-If you initialized Firebase with `firebase init`, you can enable Firestore using:
-
-```bash
-firebase init firestore
-```
+✔ Firestore is now initialized and ready.
 
 ---
 
-✔ Firestore is now active and ready to store data.
+### Step 6 — Deploy
 
----
-
-Finally, deploy:
+Now that Firestore is initialized, deploy your Firebase configuration:
 
 ```bash
 firebase deploy
@@ -205,7 +211,7 @@ firebase deploy
 
 ---
 
-### Step 6 — Seed Database (REQUIRED)
+### Step 7 — Seed Database (REQUIRED)
 
 ⚠️ **IMPORTANT**: You MUST update the coordinates before seeding, or bags will appear at a different location.
 
@@ -228,7 +234,34 @@ npx ts-node src/scripts/seed.ts
 
 ---
 
-# 🧱 4. Project Structure
+### Step 6 — Enable Anonymous Authentication (REQUIRED)
+
+The app uses anonymous authentication to allow users to access the app without creating an account. You must enable this in Firebase before seeding.
+
+**Option 1: Enable via Firebase Console (Recommended)**
+
+1. Go to Firebase Console: <https://console.firebase.google.com/>
+2. Select your project
+3. In the left sidebar, click **Authentication**
+4. Click on the **Sign-in method** tab
+5. Click **Enable** next to **Anonymous**
+6. Click **Save**
+
+**Option 2: Enable via CLI**
+
+```bash
+firebase init authentication
+```
+
+Select **Anonymous** when prompted.
+
+---
+
+✔ Anonymous authentication is now enabled. Your app can now authenticate users.
+
+---
+
+# 🧱 5. Project Structure
 
 ```
 app/                  → Screens
@@ -243,7 +276,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 🧠 5. Architecture Decisions
+# 🧠 6. Architecture Decisions
 
 - **Language Provider**: Wraps the entire app. When the language preference is switched, the entire application re-renders without requiring a full reload.
 - **Firestore Indexes**: Implemented for efficient compound queries.
@@ -255,7 +288,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 💡 6. Future Improvements
+# 💡 7. Future Improvements
 
 - Refine and improve the UI/UX design
 - Fix Google Maps clustering behavior—markers sometimes disappear at certain zoom levels
@@ -266,7 +299,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 🚨 7. Known Issues
+# 🚨 8. Known Issues
 
 - No geo-radius backend filtering implemented
 - iOS requires proper development build configuration
@@ -278,7 +311,7 @@ assets/               → Images and Static Assets
 
 ---
 
-# 📊 8. Firestore Indexes
+# 📊 9. Firestore Indexes
 
 The following composite index is required for efficient querying:
 
@@ -303,12 +336,12 @@ This index optimizes queries filtering reservations by user ID and ordering by c
 
 ---
 
-# ⏱️ 9. Time Spent
+# ⏱️ 10. Time Spent
 
-Approximately 2 days of development
+Approximately 2.5 days of development
 
 ---
 
-# 👨‍💻 10. Author
+# 👨‍💻 11. Author
 
 Built with Expo, React Native, and Firebase by Muhammad Fahad
