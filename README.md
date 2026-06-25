@@ -153,10 +153,10 @@ firebase login
 After logging in, select your project. If you know your project name, use:
 
 ```bash
-firebase use <YOUR_PROJECT_ID>
+firebase use <YOUR_PROJECT_NAME>
 ```
 
-**If you're unsure of your project id**, list all available projects:
+**If you're unsure of your project name**, list all available projects:
 
 ```bash
 firebase projects:list
@@ -165,13 +165,7 @@ firebase projects:list
 Then select your project from the list:
 
 ```bash
-firebase use <YOUR_PROJECT_ID>
-```
-
-Or Use this command to get all projects and select from the list:
-
-```bash
-firebase init
+firebase use <YOUR_PROJECT_NAME>
 ```
 
 Finally, deploy:
@@ -182,11 +176,34 @@ firebase deploy
 
 ---
 
-✔ Firestore will automatically set all rules and indexes during deployment.
+### Step 5 — Enable Firestore Database (REQUIRED)
+
+Before the app can store and retrieve data, you must enable Firestore in your Firebase project.
+
+**Option 1: Enable via Firebase Console (Recommended)**
+
+1. Go to Firebase Console: <https://console.firebase.google.com/>
+2. Select your project
+3. In the left sidebar, click **Firestore Database**
+4. Click **Create Database**
+5. Choose **Start in production mode** or **Start in test mode**
+6. Select your region and click **Enable**
+
+**Option 2: Enable via CLI**
+
+If you initialized Firebase with `firebase init`, you can enable Firestore using:
+
+```bash
+firebase init firestore
+```
 
 ---
 
-### Step 5 — Seed Database (REQUIRED)
+✔ Firestore is now active and ready to store data.
+
+---
+
+### Step 6 — Seed Database (REQUIRED)
 
 ⚠️ **IMPORTANT**: You MUST update the coordinates before seeding, or bags will appear at a different location.
 
