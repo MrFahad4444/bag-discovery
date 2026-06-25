@@ -42,18 +42,17 @@ You can run the app using:
 - 🍎 iOS Simulator
 - ⚡ Development Build (recommended)
 
-Docs:
-<https://docs.expo.dev>
+Documentation: <https://docs.expo.dev>
 
 ---
 
 # 🔐 2. Environment Setup
 
-This project uses `.env.local` for all secrets.
+This project uses `.env.local` for all environment secrets.
 
 ---
 
-## Step 1 — Rename file
+## Step 1 — Rename File
 
 ```bash
 .env.example → .env.local
@@ -61,15 +60,15 @@ This project uses `.env.local` for all secrets.
 
 ---
 
-## Step 2 — Fill values
+## Step 2 — Fill Values
 
 ```env
-EXPO_PUBLIC_FIREBASE_API_KEY=your_key
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_bucket
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+EXPO_PUBLIC_FIREBASE_API_KEY=your_apiKey
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_authDomain
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_projectId
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storageBucket
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messagingSenderId
+EXPO_PUBLIC_FIREBASE_APP_ID=your_appId
 
 GOOGLE_MAPS_ANDROID_API_KEY=your_android_key
 GOOGLE_MAPS_IOS_API_KEY=your_ios_key
@@ -79,30 +78,30 @@ GOOGLE_MAPS_IOS_API_KEY=your_ios_key
 
 ## 🗺️ Google Maps Setup (REQUIRED)
 
-Enable APIs:
+Enable the required APIs in Google Cloud Console:
 <https://console.cloud.google.com/apis/library>
 
 - Maps SDK for Android
 - Maps SDK for iOS
-- Then create an API Key and allow these 2 APIs into that key
+- Create an API Key and enable these 2 APIs for that key
 
-⚠️ If not enabled → map will be blank even with correct keys.
+⚠️ If not enabled → the map will remain blank even with correct API keys.
 
-**Or use a demo key for testing:**
+**Alternatively, use a demo key for testing:**
 <https://mapsplatform.google.com/maps-demo-key/>
 
 ---
 
 # ☁️ 3. Firebase Setup
 
-Go to Firebase Console:
+Navigate to Firebase Console:
 <https://console.firebase.google.com/>
 
 ### Step 1 — Create a New Project
 
 1. Click **Create a project**
 2. Enter project name: `bag-discovery`
-3. Accept terms and click **Continue**
+3. Accept the terms and click **Continue**
 4. Disable Google Analytics (optional) and click **Create project**
 
 ---
@@ -112,13 +111,13 @@ Go to Firebase Console:
 1. Click the **Web icon** (</>) in the project overview
 2. Enter app nickname: `bag-discovery-web`
 3. Click **Register app**
-4. Copy the Firebase config object
+4. Copy the Firebase configuration object
 
 ---
 
 ### Step 3 — Add Credentials to `.env.local`
 
-Paste the copied credentials into your `.env.local` file:
+Paste the copied Firebase credentials into your `.env.local` file:
 
 ```env
 EXPO_PUBLIC_FIREBASE_API_KEY=your_apiKey
@@ -147,7 +146,7 @@ firebase deploy
 
 ---
 
-✔ Firestore and deployment will be handled automatically
+✔ Firestore will automatically set all rules and indexes during deployment.
 
 ---
 
@@ -161,41 +160,85 @@ npx ts-node src/scripts/seed.ts
 
 # 🧱 5. Project Structure
 
-app/ → Screens  
-src/components/ → UI  
-src/functions/ → Firebase logic  
-src/hooks/ → Hooks  
-src/utils/ → Helpers  
-src/types/ → Types  
-assets/ → Images  
+```
+app/                  → Screens
+src/components/       → UI Components
+src/functions/        → Firebase Logic
+src/services/         → Firebase Setup and Generic CRUD Operations
+src/hooks/            → Custom React Hooks
+src/utils/            → Helper Functions
+src/types/            → TypeScript Type Definitions
+assets/               → Images and Static Assets
+```
 
 ---
 
 # 🧠 6. Architecture Decisions
 
-- Firebase Firestore for real-time sync  
-- Map clustering for performance  
-- Latitude/longitude stored directly  
-- Expo Router for navigation  
-- Marker optimization with tracksViewChanges  
+- **Language Provider**: Wraps the entire app. When the language preference is switched, the entire application re-renders without requiring a full reload.
+- **Firestore Indexes**: Implemented for efficient compound queries.
+- **Generic CRUD Functions**: Created reusable CRUD operations for Firestore that can be used modularly across the application.
+- **Custom Action Functions**: Built specific functions for each action, mimicking API-style endpoints using the generic CRUD layer.
+- **Custom Hooks**: Encapsulate entire Firebase operations to simplify usage and reduce complexity.
+- **Modularity & Documentation**: Code is organized modularly with comprehensive documentation for maintainability.
+- **Separation of Concerns**: UI is completely separate from business logic to keep the codebase consistent and easy to update in the future.
 
 ---
 
-# 🚨 7. Known Issues
+# 💡 7. Future Improvements
 
-- No geo-radius backend filtering  
-- iOS needs proper dev build setup  
-- Clustering varies at extreme zoom  
-- No authentication  
-
----
-
-# ⏱️ 8. Time Spent
-
-~X hours total
+- Refine and improve the UI/UX design
+- Fix Google Maps clustering behavior—markers sometimes disappear at certain zoom levels
+- Implement a carousel view for bags displayed on the map, with synchronized marker highlighting during swipes
+- Add distance calculation and filter results based on proximity
+- Implement time-based status validation to confirm availability only within specified time windows
+- Optimize API calls to prevent duplicate requests (Home page and Maps currently request the same products twice)
 
 ---
 
-# 👨‍💻 9. Author
+# 🚨 8. Known Issues
 
-Built with Expo + React Native + Firebase
+- No geo-radius backend filtering implemented
+- iOS requires proper development build configuration
+- Clustering behavior is inconsistent at extreme zoom levels; markers may not render properly
+- Anonymous authentication used (no user authentication system)
+- Home page and Maps screen load the same products, resulting in duplicate API requests—should be called once and reflected across screens
+- Custom map markers and carousel view not yet implemented
+- Expo Notification warning: As of SDK 53, notifications require a development build rather than Expo Go, but the app currently functions with Expo Go
+
+---
+
+# 📊 9. Firestore Indexes
+
+The following composite index is required for efficient querying:
+
+```json
+{
+  "collectionGroup": "reservations",
+  "queryScope": "COLLECTION",
+  "fields": [
+    {
+      "fieldPath": "userId",
+      "order": "ASCENDING"
+    },
+    {
+      "fieldPath": "createdAt",
+      "order": "DESCENDING"
+    }
+  ]
+}
+```
+
+This index optimizes queries filtering reservations by user ID and ordering by creation date.
+
+---
+
+# ⏱️ 10. Time Spent
+
+Approximately 2.5 days of development
+
+---
+
+# 👨‍💻 11. Author
+
+Built with Expo, React Native, and Firebase by Muhammad Fahad
