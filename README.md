@@ -132,13 +132,43 @@ EXPO_PUBLIC_FIREBASE_APP_ID=your_appId
 
 ### Step 4 — Login & Deploy
 
+First, install Firebase CLI tools globally (if not already installed):
+
+```bash
+npm install -g firebase-tools
+```
+
+**Important**: You must be logged in with the account that created the Firebase project. If you're already logged in with a different account, logout first:
+
+```bash
+firebase logout
+```
+
+Then login with the correct account:
+
 ```bash
 firebase login
 ```
 
+After logging in, select your project. If you know your project name, use:
+
 ```bash
-firebase use bag-discovery
+firebase use <YOUR_PROJECT_NAME>
 ```
+
+**If you're unsure of your project name**, list all available projects:
+
+```bash
+firebase projects:list
+```
+
+Then select your project from the list:
+
+```bash
+firebase use <YOUR_PROJECT_NAME>
+```
+
+Finally, deploy:
 
 ```bash
 firebase deploy
