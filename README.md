@@ -250,7 +250,7 @@ This index optimizes queries filtering reservations by user ID and ordering by c
 
 # ⏱️ 9. Time Spent
 
-Approximately 2.5 days of development
+Approximately 2 days of development
 
 ---
 
