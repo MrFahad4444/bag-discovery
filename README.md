@@ -209,7 +209,7 @@ Now that Firestore is initialized, deploy your Firebase configuration:
 firebase deploy
 ```
 
-Wait 5 minute foir indexes to be build
+Wait 5 minute for indexes to be build
 
 ---
 
