@@ -168,6 +168,12 @@ Then select your project from the list:
 firebase use <YOUR_PROJECT_NAME>
 ```
 
+Or Use this command to get all projects and select from the list:
+
+```bash
+firebase init
+```
+
 Finally, deploy:
 
 ```bash
