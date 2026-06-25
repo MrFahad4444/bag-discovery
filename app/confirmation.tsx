@@ -41,6 +41,7 @@ export default function ConfirmationScreen() {
     const handleGoToHomeScreen = () => {
         router.back();
         router.back();
+        router.navigate('/tabs/home');
     };
 
     return (

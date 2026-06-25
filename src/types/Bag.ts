@@ -17,6 +17,8 @@ type Bag = {
     pickupStart: Timestamp;
     pickupEnd: Timestamp;
     imageUrl: string;
+    latitude: number;
+    longitude: number;
     createdAt: Timestamp;
 };
 

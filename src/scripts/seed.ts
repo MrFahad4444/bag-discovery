@@ -52,6 +52,42 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 /**
+ * Riyadh center coordinates.
+ */
+const RIYADH_LAT = 24.7136;
+const RIYADH_LNG = 46.6753;
+
+/**
+ * Generates random nearby coordinates around Riyadh.
+ *
+ * Useful for:
+ * - clustering demos
+ * - nearby product simulation
+ * - realistic map rendering
+ */
+function generateNearbyCoordinate(
+    baseLat: number,
+    baseLng: number
+) {
+    /**
+     * Coordinate spread.
+     *
+     * Increase for wider map distribution.
+     */
+    const offset = 0.12;
+
+    return {
+        latitude:
+            baseLat +
+            (Math.random() - 0.5) * offset,
+
+        longitude:
+            baseLng +
+            (Math.random() - 0.5) * offset,
+    };
+}
+
+/**
  * Seeds the Firestore database with fake bag data.
  *
  * Uses Firestore batch writes for:
@@ -78,6 +114,10 @@ async function seedDatabase(): Promise<void> {
             batch.set(docRef, {
                 id: docRef.id,
                 ...bag,
+                ...generateNearbyCoordinate(
+                    RIYADH_LAT,
+                    RIYADH_LNG
+                ),
             });
         });
 
