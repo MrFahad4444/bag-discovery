@@ -170,7 +170,7 @@ firebase use <YOUR_PROJECT_NAME>
 
 ---
 
-### Step 5 — Enable Firestore Database (REQUIRED)
+### Enable Firestore Database (REQUIRED)
 
 Before the app can store and retrieve data, you must enable Firestore in your Firebase project.
 
